@@ -1,0 +1,27 @@
+﻿<Window x:Class="tempproj.pwdBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tempproj"
+        mc:Ignorable="d"
+        Title="pwdBox" Height="199.334" Width="495.437">
+    <Grid Height="170" Margin="0,0,-0.2,-0.4" VerticalAlignment="Top">
+        <StackPanel Margin="70,12,70.8,12.2" RenderTransformOrigin="0.5,0.5">
+            <StackPanel.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform AngleY="0.28"/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="0.851"/>
+                </TransformGroup>
+            </StackPanel.RenderTransform>
+            <TextBlock Text="이 기능은 개발자 기능입니다. " ></TextBlock>
+            <Label Content="Password"></Label>
+            <Label></Label>
+            <PasswordBox x:Name="pwBox"></PasswordBox>
+            <Button x:Name="btnEnter" Margin="20, 20, 20, 20" Height="30" Width="100" HorizontalAlignment="Center" Click="btnEnter_Click" Content="ENTER"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

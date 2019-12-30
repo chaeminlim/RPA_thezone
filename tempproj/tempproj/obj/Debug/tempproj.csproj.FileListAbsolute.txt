@@ -1,0 +1,14 @@
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\Debug\tempproj.exe.config
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\Debug\tempproj.exe
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\Debug\tempproj.pdb
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.csprojAssemblyReference.cache
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\MainWindow.g.cs
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\App.g.cs
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj_MarkupCompile.cache
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj_MarkupCompile.lref
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\MainWindow.baml
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.g.resources
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.Properties.Resources.resources
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.csproj.GenerateResource.cache
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.exe
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\Debug\tempproj.pdb

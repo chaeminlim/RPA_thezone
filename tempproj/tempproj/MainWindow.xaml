@@ -1,0 +1,59 @@
+﻿<Window x:Class="tempproj.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tempproj"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="650" Width="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="43*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
+            <ToolBar>
+                <Button x:Name="Recorder" Content="Recorder" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Recorder_Click" />
+            </ToolBar>
+        </Grid>
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <StackPanel>
+                    <Button x:Name="btnOpenFile" Content="Open Excel File" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="ClearListBox" Content="Clear ListBox" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnLoadXml" Content="Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"></Button>
+
+
+                    <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap"></TextBlock>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type ListBox}">
+                            <Setter Property="Margin" Value="0,10,0,0"></Setter>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Label x:Name="ExcelListViewLabel" Content="Excel List"></Label>
+                    <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                    <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
+                    <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="2">
+                <StackPanel>
+                    <Button x:Name="btnStartWorkflow" Content="Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"></Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

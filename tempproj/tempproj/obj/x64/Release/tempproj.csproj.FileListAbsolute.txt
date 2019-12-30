@@ -1,0 +1,13 @@
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\x64\Release\tempproj.exe.config
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\x64\Release\tempproj.exe
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\bin\x64\Release\tempproj.pdb
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\MainWindow.g.cs
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\App.g.cs
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj_MarkupCompile.cache
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj_MarkupCompile.lref
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\MainWindow.baml
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj.g.resources
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj.Properties.Resources.resources
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj.csproj.GenerateResource.cache
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj.exe
+C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\tempproj.pdb
