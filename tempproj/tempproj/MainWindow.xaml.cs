@@ -36,6 +36,13 @@ namespace tempproj
             InitContext();
         }
 
+        public void WriteDebugLine(string text)
+        {
+            DebugConsoleBlock.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                DebugConsoleBlock.Text += text + Environment.NewLine;
+            }));
+        }
         private void InitContext()
         {
             contextController = new ContextController();
@@ -65,6 +72,7 @@ namespace tempproj
             foreach(string filename in openFileDialog.FileNames)
             {
                 ExcelListView.Items.Add(filename);
+                
             }
         }
           
@@ -86,7 +94,7 @@ namespace tempproj
                 WorkflowXmlListView.SelectAll();
                 contextController.SetWorkflowXmlPath((string)WorkflowXmlListView.SelectedItem);
 
-                foreach (string excel in ExcelListView.SelectedItems)
+                foreach (string excel in ExcelWorkEndView.SelectedItems)
                 {
                     contextController.AddExcelPath(excel);
                 }
@@ -107,7 +115,9 @@ namespace tempproj
                     int ErrCode = wf.DoActionXml(line);
                     if (ErrCode == 0 || ErrCode >= 2)
                     {
+                        WriteDebugLine("Error Code" + ErrCode);
                         MessageBox.Show("Error Code " + ErrCode + ".\n 프로그램을 중단합니다.");
+                        
                         return;
                     }
 
@@ -120,6 +130,24 @@ namespace tempproj
                 MessageBox.Show("xmlFile이 로드되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+        }
+
+
+        private void Recorder_Click(object sender, RoutedEventArgs e)
+        {
+            pwdBox pwdBox = new pwdBox();
+            pwdBox.ShowDialog();
+            
+            if (pwdBox.valid == 1)
+            {
+                Recorder recorder = new Recorder(contextController);
+                recorder.ShowDialog();
+            }
+            else
+            {
+                return;
+            }
+            
         }
 
         private void btnLoadXml_Click(object sender, RoutedEventArgs e)
@@ -137,21 +165,16 @@ namespace tempproj
             }
         }
 
-        private void Recorder_Click(object sender, RoutedEventArgs e)
+        private void BtnStartExcelWork_Click(object sender, RoutedEventArgs e)
         {
-            pwdBox pwdBox = new pwdBox();
-            pwdBox.ShowDialog();
-            
-            if (pwdBox.valid == 1)
+            // do stm
+            if (MessageBox.Show("Excel 작업을 시작하시겠습니까?", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
             {
-                Recorder recorder = new Recorder(contextController);
-                recorder.ShowDialog();
             }
             else
             {
-                return;
+                WriteDebugLine("Job done");
             }
-            
         }
     }
 }

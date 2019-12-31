@@ -7,6 +7,14 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="650" Width="1000">
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="10,10,10,10"></Setter>
+                <Setter Property="Background" Value="AliceBlue"></Setter>
+                <Setter Property="BorderThickness" Value="0"></Setter>
+                <Setter Property="Height" Value="25"></Setter>
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="43*"/>
@@ -28,12 +36,15 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <StackPanel>
-                    <Button x:Name="btnOpenFile" Content="Open Excel File" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
+                    
+                    <Button x:Name="btnOpenFile" Content="Load Excel File" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnStartExcelWork" Content="Start Excel Work" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"></Button>
                     <Button x:Name="ClearListBox" Content="Clear ListBox" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"></Button>
                     <Button x:Name="btnLoadXml" Content="Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"></Button>
 
 
-                    <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap"></TextBlock>
+                    <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"></TextBlock>
+                    <TextBlock x:Name="DebugConsoleBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Beige"></TextBlock>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1">
@@ -43,8 +54,10 @@
                             <Setter Property="Margin" Value="0,10,0,0"></Setter>
                         </Style>
                     </StackPanel.Resources>
-                    <Label x:Name="ExcelListViewLabel" Content="Excel List"></Label>
+                    <Label x:Name="ExcelListViewLabel" Content="Excel Work Queue"></Label>
                     <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                    <Label x:Name="ExcelWorkEndLabel" Content="Excel Work Done"></Label>
+                    <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
                     <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
                     <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
                 </StackPanel>

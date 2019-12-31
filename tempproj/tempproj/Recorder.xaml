@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:tempproj"
         mc:Ignorable="d"
-        Title="Recorder" Height="900" Width="546.154" WindowStartupLocation="CenterScreen" Background="White" BorderThickness="0">
+        Title="Recorder" Height="500" Width="546.154" WindowStartupLocation="CenterScreen" Background="White" BorderThickness="0">
     <Grid>
         <StackPanel>
             <DockPanel>
