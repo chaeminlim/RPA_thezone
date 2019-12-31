@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +29,8 @@ namespace tempproj
     {
         private MainController MainControllerObject;
         private ContextController contextController;
-        
+        private ExcelActivity excelActivity;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,6 +47,7 @@ namespace tempproj
         }
         private void InitContext()
         {
+            excelActivity = new ExcelActivity();
             contextController = new ContextController();
         }
 
@@ -120,8 +123,6 @@ namespace tempproj
                         
                         return;
                     }
-
-                    Thread.Sleep(1000);
                 }
 
             }
@@ -173,7 +174,58 @@ namespace tempproj
             }
             else
             {
+                ExcelTemplateView.SelectAll();
+                string templatePath = (string)ExcelTemplateView.SelectedItem;
+                if (templatePath == null)
+                {
+                    WriteDebugLine("템플릿 파일이 로드되지 않았습니다.");
+                    return;
+                }
+
+                foreach (String path in ExcelListView.Items)
+                {
+                    string extension = System.IO.Path.GetExtension(templatePath);
+                    string savePath = System.IO.Path.GetFileNameWithoutExtension(path);
+                    
+                    savePath = System.IO.Path.GetFullPath(path)  + savePath + "_수정본";
+                    savePath += extension;
+
+                    Debug.WriteLine(path);
+                    Debug.WriteLine(templatePath);
+                    Debug.WriteLine(savePath);
+
+
+                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        Exception ErrorCode = excelActivity.Work(path, templatePath, savePath);
+
+                        if (ErrorCode != null)
+                        {
+                            WriteDebugLine(ErrorCode.ToString());
+                            return;
+                        }
+                    }));
+
+                    ExcelWorkEndView.Items.Add(savePath);
+                }
+
                 WriteDebugLine("Job done");
+            }
+        }
+
+        private void BtnOpenTemplateFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls";
+
+
+            if (openFileDialog.ShowDialog() == false)
+                return;
+
+            foreach (string filename in openFileDialog.FileNames)
+            {
+                ExcelTemplateView.Items.Add(filename);
+
             }
         }
     }

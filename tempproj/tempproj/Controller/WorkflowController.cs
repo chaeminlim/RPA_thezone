@@ -67,7 +67,7 @@ namespace tempproj
 
                 if (num == 0)
                 {
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                 }
                 else if (num == 1)
                 {

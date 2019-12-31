@@ -36,7 +36,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <StackPanel>
-                    
+                    <Button x:Name="btnOpenTemplateFile" Content="Load Excel Template" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"></Button>
                     <Button x:Name="btnOpenFile" Content="Load Excel File" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
                     <Button x:Name="btnStartExcelWork" Content="Start Excel Work" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"></Button>
                     <Button x:Name="ClearListBox" Content="Clear ListBox" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"></Button>
@@ -54,6 +54,8 @@
                             <Setter Property="Margin" Value="0,10,0,0"></Setter>
                         </Style>
                     </StackPanel.Resources>
+                    <Label x:Name="ExcelTemplateViewLabel" Content="Excel Template"></Label>
+                    <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch"></ListView>
                     <Label x:Name="ExcelListViewLabel" Content="Excel Work Queue"></Label>
                     <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
                     <Label x:Name="ExcelWorkEndLabel" Content="Excel Work Done"></Label>

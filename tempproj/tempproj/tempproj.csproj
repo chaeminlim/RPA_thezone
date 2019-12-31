@@ -83,6 +83,7 @@
     </ApplicationDefinition>
     <Compile Include="Controller\ContextController.cs" />
     <Compile Include="Controller\WorkflowController.cs" />
+    <Compile Include="Controller\ExcelActivity.cs" />
     <Compile Include="InputBox.xaml.cs">
       <DependentUpon>InputBox.xaml</DependentUpon>
     </Compile>

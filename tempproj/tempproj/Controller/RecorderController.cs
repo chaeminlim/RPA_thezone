@@ -92,6 +92,7 @@ namespace tempproj
                 mouseFlag = 0;
             }
         }
+
         public void Clear()
         {
             contextController.ClearRecorderXmlQueue();
@@ -191,6 +192,7 @@ namespace tempproj
 
         public void StartRecorded()
         {
+
             XmlController xmlController = new XmlController();
             while (contextController.CountRecorderXmlQueue() > 1)
             {
