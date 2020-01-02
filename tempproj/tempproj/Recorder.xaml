@@ -24,6 +24,7 @@
             </DockPanel>
             <Label Content="Record List"></Label>
             <ListView x:Name="RecorderListView" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+            <TextBlock x:Name="DebugConsole" TextWrapping="Wrap" Text="debugConsole"></TextBlock>
         </StackPanel>
     </Grid>
 

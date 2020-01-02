@@ -33,6 +33,14 @@ namespace tempproj
             recorderController = new RecorderController(contextController, this);
             recorderController.Install();   
         }
+        public void WriteDebugLine(string text)
+        {
+            DebugConsole.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                DebugConsole.Text += text + Environment.NewLine;
+            }));
+        }
+
 
         private void RecordStart_Click(object sender, RoutedEventArgs e)
         {

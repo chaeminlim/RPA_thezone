@@ -200,20 +200,20 @@ namespace tempproj
                 AutomationElement ae;
                 int num;
                 Thread.Sleep(1500);
+
                 (num, ae) = xmlController.XmlFinder(xmlData);
 
+                for (int i = 10; i > 0; i++)
+                {
 
-                if (num == 1)
-                { }
-                else if (num == 0)
-                {
-                    MessageBox.Show("num = 0");
-                    break;
-                }
-                else
-                {
-                    MessageBox.Show("num = 2+");
-                    break;
+                    if (num == 1)
+                        break;
+                    else
+                    {
+                        recorder.DebugConsole.Text += "num=" + num;
+                        (num, ae) = xmlController.XmlFinder(xmlData);
+                    }
+
                 }
 
                 WindowControl(xmlData, ae);
@@ -301,9 +301,18 @@ namespace tempproj
             }
             catch (ElementNotAvailableException e)
             {
-                Console.WriteLine(ae.Current.Name);
-                Console.WriteLine(ae.Current.IsEnabled);
+                Debug.WriteLine(e);
+                Debug.WriteLine(ae.Current.Name);
+                Debug.WriteLine(ae.Current.IsEnabled);
+                return;
 
+            }
+            catch(NoClickablePointException e)
+            {
+                Debug.WriteLine(e);
+                Debug.WriteLine(ae.Current.Name);
+                Debug.WriteLine(ae.Current.IsEnabled);
+                return;
             }
         }
 

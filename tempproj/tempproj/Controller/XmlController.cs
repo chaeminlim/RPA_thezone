@@ -113,15 +113,14 @@ namespace tempproj
             while (xmlQueue.Count > 0)
             {
                 XmlNode xmlNode = xmlQueue.Dequeue();
-                // debug
-                Console.WriteLine("loop start");
-                foreach (var elem in elemQueue1)
+            
+                try
                 {
-                    Console.WriteLine(elem.Current.Name);
+                    elemQueue1 = ElementXMlFinder(xmlNode, elemQueue1, depth);
                 }
-                Console.WriteLine("loop end");
-                // debug end
-                elemQueue1 = ElementXMlFinder(xmlNode, elemQueue1, depth);
+                catch(Exception e)
+                {
+                }
 
                 depth -= 1;
 
@@ -333,10 +332,11 @@ namespace tempproj
                     while (windowQueue.Count > 0)
                     {
                         AutomationElement ae = windowQueue.Dequeue();
-                        Process p = Process.GetProcessById(ae.Current.ProcessId);
-
+                        
                         try
                         {
+                            Process p = Process.GetProcessById(ae.Current.ProcessId);
+
                             if (p.MainModule.ModuleName == attribute.Value)
                             {
                                 Filter1.Enqueue(ae);
