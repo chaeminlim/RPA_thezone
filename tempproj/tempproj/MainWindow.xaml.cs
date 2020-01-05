@@ -19,6 +19,9 @@ using System.Data;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Diagnostics;
 using tempproj.Controller;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 
 namespace tempproj
 {
@@ -227,6 +230,12 @@ namespace tempproj
                 ExcelTemplateView.Items.Add(filename);
 
             }
+        }
+
+        private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
+        {
+            MappingTable mappingTable = new MappingTable();
+            mappingTable.ShowDialog();
         }
     }
 }

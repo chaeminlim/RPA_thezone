@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\obj\x64\Release\
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\
 tempproj
 none
 false
 TRACE
-C:\Users\Chae Min Lim\Desktop\tempproj\tempproj\App.xaml
-11151548125
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\App.xaml
+5-1912435198
 
-14-1100735274
-17-1395682257
-MainWindow.xaml;
+20-1028761077
+211213903779
+InputBox.xaml;MainWindow.xaml;MappingTable.xaml;pwdBox.xaml;Recorder.xaml;
 
 True
 

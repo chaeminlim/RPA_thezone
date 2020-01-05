@@ -1,0 +1,53 @@
+﻿<Window x:Class="tempproj.MappingTable"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:tempproj"
+        mc:Ignorable="d"
+        Title="MappingTable" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="10*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <StackPanel>
+                <ComboBox x:Name="ClientTypeComboBox" ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged">
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="83*"/>
+                <ColumnDefinition Width="711*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.ColumnSpan="2" Margin="0,0,-0.4,-0.4">
+                <DataGrid x:Name="MappingDataGrid" CanUserAddRows="True">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Click="DeleteMember">Details</Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="From" Binding="{Binding Path=KeyString}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="To" Binding="{Binding Path=ValueString}"></DataGridTextColumn>
+                      
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Label x:Name="StatusLabel" Content=""></Label>
+                <Label Content="From"></Label>
+                <TextBox  x:Name="FromTextBox" Background="AliceBlue"></TextBox>
+                <Label Content="To"></Label>
+                <TextBox x:Name="ToTextBox"  Background="AliceBlue"></TextBox>
+                <Button x:Name="btn_AddRow" Content="추가하기" Click="btn_AddRow_Click"></Button>
+                <Button x:Name="btn_deleteRow" Content="선택 지우기" Click="btn_deleteRow_Click" ></Button>
+                <Button x:Name="btn_Save" Content="저장하기" Click="btn_Save_Click"></Button>
+
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

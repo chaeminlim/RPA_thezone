@@ -26,6 +26,7 @@
         <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
             <ToolBar>
                 <Button x:Name="Recorder" Content="Recorder" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Recorder_Click" />
+                <Button x:Name="btn_MappingTable" Content="MappingTable" Click="btn_MappingTable_Click"></Button>
             </ToolBar>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">

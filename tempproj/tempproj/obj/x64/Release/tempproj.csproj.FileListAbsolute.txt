@@ -32,3 +32,8 @@ C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Rel
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.GenerateResource.cache
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.exe
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.pdb
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\Newtonsoft.Json.dll
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\Newtonsoft.Json.xml
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.g.cs
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.baml
+C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.CopyComplete
