@@ -95,7 +95,7 @@ namespace tempproj
 
             for (int i = 0; i < mappingNameList.Count; i++)
             {
-                MappingDataGrid.Items.Add(new MappingDataMember(mappingNameList[i], mappingValueList[i]));
+                MappingDataGrid.Items.Add(new MappingDataMember(mappingNameList[i], mappingValueList[i], true));
             }
         }
 
@@ -124,9 +124,6 @@ namespace tempproj
 
         }
 
-        private void btn_deleteRow_Click(object sender, RoutedEventArgs e)
-        {
-        }
 
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
@@ -145,10 +142,11 @@ namespace tempproj
 
         public class MappingDataMember
         {
-            public MappingDataMember(string keystring, string valuestring)
+            public MappingDataMember(string keystring, string valuestring, bool isIncluded)
             {
                 KeyString = keystring;
                 ValueString = valuestring;
+                IsIncluded = isIncluded;
             }
 
             public string KeyString
@@ -159,10 +157,16 @@ namespace tempproj
             {
                 get; set;
             }
+            public bool IsIncluded
+            {
+                get; set;
+            }
+
         }
 
-        private void DeleteMember(object sender, RoutedEventArgs e)
+        private void btn_deleteRow_Click(object sender, RoutedEventArgs e)
         {
         }
+
     }
 }

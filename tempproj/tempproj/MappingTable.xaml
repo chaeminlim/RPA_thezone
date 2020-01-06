@@ -19,24 +19,19 @@
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="83*"/>
-                <ColumnDefinition Width="711*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.ColumnSpan="2" Margin="0,0,-0.4,-0.4">
-                <DataGrid x:Name="MappingDataGrid" CanUserAddRows="True">
+            <StackPanel Grid.Column="0" Margin="0,0,-0.4,-0.4">
+                <DataGrid x:Name="MappingDataGrid">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Click="DeleteMember">Details</Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGridCheckBoxColumn Header="Included" Binding="{Binding Path=IsIncluded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></DataGridCheckBoxColumn>
                         <DataGridTextColumn Header="From" Binding="{Binding Path=KeyString}"></DataGridTextColumn>
                         <DataGridTextColumn Header="To" Binding="{Binding Path=ValueString}"></DataGridTextColumn>
-                      
                     </DataGrid.Columns>
                 </DataGrid>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
                 <Label x:Name="StatusLabel" Content=""></Label>
                 <Label Content="From"></Label>
                 <TextBox  x:Name="FromTextBox" Background="AliceBlue"></TextBox>
@@ -45,8 +40,8 @@
                 <Button x:Name="btn_AddRow" Content="추가하기" Click="btn_AddRow_Click"></Button>
                 <Button x:Name="btn_deleteRow" Content="선택 지우기" Click="btn_deleteRow_Click" ></Button>
                 <Button x:Name="btn_Save" Content="저장하기" Click="btn_Save_Click"></Button>
-
             </StackPanel>
+            
         </Grid>
 
     </Grid>
