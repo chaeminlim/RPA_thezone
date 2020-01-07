@@ -25,7 +25,7 @@
             <StackPanel Grid.Column="0" Margin="0,0,-0.4,-0.4">
                 <DataGrid x:Name="MappingDataGrid">
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Header="Included" Binding="{Binding Path=IsIncluded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></DataGridCheckBoxColumn>
+                        <DataGridCheckBoxColumn Header="Included" Binding="{Binding Path=IsIncluded}"></DataGridCheckBoxColumn>
                         <DataGridTextColumn Header="From" Binding="{Binding Path=KeyString}"></DataGridTextColumn>
                         <DataGridTextColumn Header="To" Binding="{Binding Path=ValueString}"></DataGridTextColumn>
                     </DataGrid.Columns>

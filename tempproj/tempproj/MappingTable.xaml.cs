@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,8 +42,6 @@ namespace tempproj
 
             try
             {
-
-
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
@@ -106,7 +105,7 @@ namespace tempproj
 
             try
             {
-                CurrentJsonObj.Add(JKey, JValue);
+                MappingDataGrid.Items.Add(new MappingDataMember(JKey, JValue, false));
             }
             catch (NullReferenceException)
             {
@@ -119,26 +118,43 @@ namespace tempproj
                 StatusLabel.Content = "중복되는 컬럼이 존재합니다.";
                 return;
             }
-
-            UpdateList();
-
         }
-
-
-        private void btn_Save_Click(object sender, RoutedEventArgs e)
+        private void btn_deleteRow_Click(object sender, RoutedEventArgs e)
         {
-            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
-            using (JsonTextReader reader = new JsonTextReader(file))
+            while (MappingDataGrid.SelectedItems.Count >= 1)
             {
-                JObject object1 = (JObject)JToken.ReadFrom(reader);
-                object1[SelectedcbItem.Content] = CurrentJsonObj;
-                string output = Newtonsoft.Json.JsonConvert.SerializeObject(object1, Newtonsoft.Json.Formatting.Indented);
-                reader.Close();
-
-                File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+                MappingDataGrid.Items.Remove(MappingDataGrid.SelectedItem);
             }
         }
 
+        private void btn_Save_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    CurrentJsonObj.RemoveAll();
+                    foreach (MappingDataMember m in MappingDataGrid.Items)
+                    {
+                        CurrentJsonObj.Add(m.KeyString, m.ValueString);
+                    }
+
+                    JObject object1 = (JObject)JToken.ReadFrom(reader);
+                    object1[SelectedcbItem.Content] = CurrentJsonObj;
+                    string output = Newtonsoft.Json.JsonConvert.SerializeObject(object1, Newtonsoft.Json.Formatting.Indented);
+                    reader.Close();
+
+                    File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+                }
+                MessageBox.Show("적용이 완료되었습니다");
+                UpdateList();
+            }
+            catch (System.ArgumentException)
+            {
+                MessageBox.Show("같은 from값은 넣을수 없습니다");
+            }
+        }
 
         public class MappingDataMember
         {
@@ -163,10 +179,5 @@ namespace tempproj
             }
 
         }
-
-        private void btn_deleteRow_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
     }
 }

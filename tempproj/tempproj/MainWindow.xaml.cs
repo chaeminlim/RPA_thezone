@@ -234,8 +234,12 @@ namespace tempproj
 
         private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
         {
-            MappingTable mappingTable = new MappingTable();
-            mappingTable.ShowDialog();
+            try
+            {
+                MappingTable mappingTable = new MappingTable();
+                mappingTable.ShowDialog();
+            }
+            catch (System.InvalidOperationException) { MessageBox.Show("더블클릭은 안됩니다"); } //더블클릭 Exception 방지
         }
     }
 }
