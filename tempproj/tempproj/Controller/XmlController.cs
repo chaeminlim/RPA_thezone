@@ -118,7 +118,7 @@ namespace tempproj
                 {
                     elemQueue1 = ElementXMlFinder(xmlNode, elemQueue1, depth);
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                 }
 
