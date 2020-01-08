@@ -112,37 +112,6 @@ namespace tempproj
                     }
                 }
             }
-
-            /*
-            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
-            {
-                
-                if (mapped_table[item.Key].ToString().Equals("사원코드"))
-                {
-                    int offset = Find_Entry(exl, item.Value.Row, item.Value.Column);
-                    temp = eWS[exl].Cells[item.Value.Row+offset, item.Value.Column];
-                    ID = eWS[exl].Range[temp, temp.End[Excel.XlDirection.xlDown]];
-                    
-                    colvalues.Add(item.Key, ID.Value);
-                    IDcnt = ID.Count;
-                    Console.WriteLine(IDcnt);
-                    break;
-                }
-            }
-            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
-            {
-                if (!mapped_table[item.Key].ToString().Equals("사원코드"))
-                {
-                    int offset = Find_Entry(exl, item.Value.Row, item.Value.Column); //cell이 병합됬을 경우 시작점 계산
-                    string col = GetExcelColumnName(item.Value.Column);
-                    int rstart = item.Value.Row + offset;
-                    int rend = rstart + IDcnt - 1;
-                    Console.WriteLine(item.Key + " " + rstart + " " + rend);
-                    Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
-                    temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
-                    colvalues.Add(item.Key, temp.Value);
-                }
-            }*/
         }
 
         private string GetExcelColumnName(int columnNumber)
@@ -223,7 +192,6 @@ namespace tempproj
                         Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, false, Type.Missing, Type.Missing);
                     if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column)
                     {
-
                         Console.WriteLine(name);
                         Console.WriteLine(rng.Address);
                         Console.WriteLine(currentFind.Address);
@@ -242,48 +210,117 @@ namespace tempproj
             }
         }
 
-        private void Copy_Paste(string exl)
+        private void Copy_Paste(string exl, string exl2)
         {
-            Excel.Range colrng = eWS[exl].Range["A1", eWS[exl].Range["A1"].End[Excel.XlDirection.xlToRight]];
+            Excel.Range colrng = eWS[exl2].Range["A1", eWS[exl2].Range["A1"].End[Excel.XlDirection.xlToRight]];
             int colcnt = colrng.Count;
+            String key = String.Empty;
+            Excel.Range rng = null;
             foreach (KeyValuePair<string, List<object[,]>> item in colvalues2)
             {
-                foreach (Excel.Range rng in colrng)
+                foreach (var values in item.Value) //item.Value => List<object[,]>
                 {
-                    if (mapped_table[item.Key].ToString().Equals(rng.Value))
+                    int row = 4;
+                    Console.WriteLine(item.Key + " is Found");
+                    foreach (var val in values)
                     {
-                        foreach (var values in item.Value)
+                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))
                         {
-                            int col = 4;
-                            Console.WriteLine(item.Key + " is Found");
-                            foreach (var val in values)
+                            if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
                             {
-                                if (!mapped_table[item.Key].ToString().Equals("사원코드"))
+                                rng = colrng.Find(mapped_table[item.Key].ToString());
+                            }
+                            else //Rule 3 적용
+                            {
+                                key = Get_Colname(exl, item.Key, row, (JObject)mapped_table[item.Key]);
+                                if (key == null)
                                 {
-                                    if (rng[col.ToString()].Value != null)
-                                    {
-                                        if (val != null)
-                                            rng[col.ToString()].Value += Math.Truncate((double)val);
-                                        else
-                                            rng[col.ToString()].Value += 0;
-                                    }
-                                    else
-                                    {
-                                        if (val != null)
-                                            rng[col.ToString()].Value = Math.Truncate((double)val);
-                                        else
-                                            rng[col.ToString()].Value += 0;
-                                    }
+                                    row++;
+                                    continue;
                                 }
+
+                                rng = colrng.Find(key);
+                            }
+                            if (rng[row.ToString()].Value != null)
+                            {
+                                if (val != null)
+                                    rng[row.ToString()].Value += Math.Truncate((double)val);
                                 else
-                                    rng[col.ToString()].Value = val;
-                                col++;
+                                    rng[row.ToString()].Value += 0;
+                            }
+                            else
+                            {
+                                if (val != null)
+                                    rng[row.ToString()].Value = Math.Truncate((double)val);
+                                else
+                                    rng[row.ToString()].Value += 0;
                             }
                         }
-                        break;
+                        else
+                        {
+                            rng = colrng.Find(mapped_table[item.Key].ToString());
+                            rng[row.ToString()].Value = val;
+                        }
+                        row++;
+                    }
+
+                }
+            }
+        }
+
+        private String Get_Colname(string exl, string itemkey, int row, JObject json)
+        {
+            String position, pos, key = null;
+            int offset, dest;
+            position = json["구분"].ToString();
+
+            Excel.Range prng = eWS[exl].UsedRange.Find(position);
+            offset = Find_Entry(exl, prng.Address); //cell이 병합됬을 경우 시작점 계산
+            dest = prng.Row + offset + row - 4;
+            pos = prng.Cells[dest].Value;
+
+            if (itemkey.Contains("/"))
+            {
+                if (pos != null)
+                {
+                    Console.WriteLine(dest + " " + pos);
+                    JArray positions = (JArray)json["값"];
+
+                    foreach (var item in positions)
+                    {
+                        if (pos.Equals(item.ToString()))
+                        {
+                            key = json["True"].ToString();
+                            Console.WriteLine(key);
+                            break;
+                        }
+                    }
+                    if (key == null)
+                    {
+                        key = json["False"].ToString();
                     }
                 }
             }
+            else
+            {
+                if (pos != null)
+                {
+                    Console.WriteLine(dest + " " + pos);
+                    JArray positions = (JArray)json["값"];
+
+                    foreach (var item in positions)
+                    {
+                        if (pos.Equals(item.ToString()))
+                        {
+                            key = json["True"].ToString();
+                            Console.WriteLine(key);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return key;
         }
 
         private void Brush(string exl)
