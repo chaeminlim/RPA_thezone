@@ -32,16 +32,17 @@
         <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <StackPanel>
-                    <Button x:Name="btnOpenTemplateFile" Content="Load Excel Template" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"></Button>
-                    <Button x:Name="btnOpenFile" Content="Load Excel File" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
-                    <Button x:Name="btnStartExcelWork" Content="Start Excel Work" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"></Button>
-                    <Button x:Name="ClearListBox" Content="Clear ListBox" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"></Button>
-                    <Button x:Name="btnLoadXml" Content="Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnOpenTemplateFile" Content="급여수당 일괄 업로드 양식 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnOpenFile" Content="작업할 엑셀 파일 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnStartExcelWork" Content="엑셀 작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="ClearListBox" Content="작업 큐 지우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"></Button>
+                    <Button x:Name="btnLoadXml" Content="XML 불러오기" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"></Button>
+                    <ComboBox x:Name="ClientTypeComboBox" ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged" Margin="66,0,65.2,0"></ComboBox>
+                    <Button x:Name="btnStartWorkflow" Content="Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"></Button>
 
 
                     <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"></TextBlock>
@@ -49,27 +50,23 @@
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <StackPanel>
+                <StackPanel Margin="10, 10, 20, 10 ">
                     <StackPanel.Resources>
                         <Style TargetType="{x:Type ListBox}">
                             <Setter Property="Margin" Value="0,10,0,0"></Setter>
                         </Style>
                     </StackPanel.Resources>
-                    <Label x:Name="ExcelTemplateViewLabel" Content="Excel Template"></Label>
-                    <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch"></ListView>
-                    <Label x:Name="ExcelListViewLabel" Content="Excel Work Queue"></Label>
+                    <Label x:Name="ExcelTemplateViewLabel" Content="급여 수당 일괄 업로드 양식"></Label>
+                    <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                    <Label x:Name="ExcelListViewLabel" Content="엑셀 작업 대기 큐"></Label>
                     <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                    <Label x:Name="ExcelWorkEndLabel" Content="Excel Work Done"></Label>
+                    <Label x:Name="ExcelWorkEndLabel" Content="엑셀 작업 완료된 파일"></Label>
                     <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
                     <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
                     <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="2">
-                <StackPanel>
-                    <Button x:Name="btnStartWorkflow" Content="Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"></Button>
-                </StackPanel>
-            </Grid>
+
         </Grid>
     </Grid>
 </Window>
