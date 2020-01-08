@@ -2,42 +2,61 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using Newtonsoft.Json.Linq;
 
 namespace tempproj
 {
     public class ExcelActivity
     {
-        public SortedList<string, Excel.Application> eXL = new SortedList<string, Excel.Application>();
-        public SortedList<string, Excel.Workbook> eWB = new SortedList<string, Excel.Workbook>();
-        public SortedList<string, Excel.Worksheet> eWS = new SortedList<string, Excel.Worksheet>();
-        public SortedList<string, object[,]> colvalues = new SortedList<string, object[,]>();
+        public struct point
+        {
+            public point(int r, int c)
+            {
+                row = r;
+                column = c;
+            }
+            public int row;
+            public int column;
+        };
+        public Dictionary<string, Excel.Application> eXL = new Dictionary<string, Excel.Application>();
+        public Dictionary<string, Excel.Workbook> eWB = new Dictionary<string, Excel.Workbook>();
+        public Dictionary<string, Excel.Worksheet> eWS = new Dictionary<string, Excel.Worksheet>();
+        public Dictionary<string, object[,]> colvalues = new Dictionary<string, object[,]>(); //key : column name , value : value of each column
+        public Dictionary<string, point> colNames = new Dictionary<string, point>(); //key : column name, key : coordinate of column on excel
+        public Dictionary<string, Excel.Range> colAddr = new Dictionary<string, Excel.Range>();
+        public JObject mapped_table = new JObject();
         public Excel.Range eRng, ID;
         public object[,] ID_values;
-        public List<String> columnNames = new List<String>();
 
-        public Exception Work(string path01, string path02, string path03)
+
+        public Exception Work(string path01, string path02, JObject json)
         {
             try
             {
+                mapped_table = json;
                 Open(path01); Open(path02);
+                Find_Columns(path01);
                 Read_Column(path01);
                 Copy_Paste(path02);
-                Save(path02, path03);
+                Brush(path02);
+                //FIrst_Column(path01);
                 Close();
                 return null;
-
             }
             catch (Exception e)
             {
                 Close();
                 return e;
             }
+
+
+
         }
 
-        public void Open(string path, string sheetName = null)
+        private void Open(string path, string sheetName = null)
         {
             eXL.Add(path, new Excel.Application());
             eWB.Add(path, eXL[path].Workbooks.Open(path));
@@ -47,60 +66,167 @@ namespace tempproj
             else                    //workbook 내에 여러 시트중 원하는 시트가 있으면 해당 시트 open
                 eWS.Add(path, eWB[path].Worksheets.Item[sheetName]);
         }
+        private object[,] Read_Range(string exl, string start, string end)
+        {
+            //eWS[exl] = eWB[exl].Worksheets.Item[sheetName];
+            eRng = eWS[exl].get_Range(start, end);
+            return eRng.Value;
+        }
 
-        public void Read_Column(string exl)
+
+
+        private void Read_Column(string exl)
+        {
+            Excel.Range usedrng = eWS[exl].UsedRange;
+            int rcnt = usedrng.Rows.Count;
+            int ccnt = usedrng.Columns.Count;
+            int IDcnt = 0; //인원수
+            Excel.Range temp, ID;
+
+
+
+            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+            {
+                int offset = Find_Entry(exl, item.Value.Row, item.Value.Column); //cell이 병합됬을 경우 시작점 계산
+                string col = GetExcelColumnName(item.Value.Column);
+                int rstart = item.Value.Row + offset;
+                int rend = rstart + rcnt - 1;
+                Console.WriteLine(item.Key + " " + rstart + " " + rend);
+                Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
+                temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
+                colvalues.Add(item.Key, temp.Value);
+            }
+
+            /*
+            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+            {
+                
+                if (mapped_table[item.Key].ToString().Equals("사원코드"))
+                {
+                    int offset = Find_Entry(exl, item.Value.Row, item.Value.Column);
+                    temp = eWS[exl].Cells[item.Value.Row+offset, item.Value.Column];
+                    ID = eWS[exl].Range[temp, temp.End[Excel.XlDirection.xlDown]];
+                    
+                    colvalues.Add(item.Key, ID.Value);
+                    IDcnt = ID.Count;
+                    Console.WriteLine(IDcnt);
+                    break;
+                }
+            }
+            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+            {
+                if (!mapped_table[item.Key].ToString().Equals("사원코드"))
+                {
+                    int offset = Find_Entry(exl, item.Value.Row, item.Value.Column); //cell이 병합됬을 경우 시작점 계산
+                    string col = GetExcelColumnName(item.Value.Column);
+                    int rstart = item.Value.Row + offset;
+                    int rend = rstart + IDcnt - 1;
+                    Console.WriteLine(item.Key + " " + rstart + " " + rend);
+                    Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
+                    temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
+                    colvalues.Add(item.Key, temp.Value);
+                }
+            }*/
+        }
+
+        private string GetExcelColumnName(int columnNumber)
+        {
+            int dividend = columnNumber;
+            string columnName = String.Empty;
+            int modulo;
+
+            while (dividend > 0)
+            {
+                modulo = (dividend - 1) % 26;
+                columnName = Convert.ToChar(65 + modulo).ToString() + columnName;
+                dividend = (int)((dividend - modulo) / 26);
+            }
+
+            return columnName;
+        }
+
+        private int Find_Entry(string exl, int r, int c)
+        {
+            Excel.Range mrng = eWS[exl].Cells[r, c];
+            bool rg = mrng.MergeCells;
+            int rows = 1;
+            if (rg)
+            {
+                if (eWS[exl].Cells[r, c].MergeCells != null)
+                {
+                    dynamic mvalue = mrng.MergeArea.Value2;
+                    object[,] vals = mvalue as object[,];
+                    if (vals != null)
+                    {
+                        rows = vals.GetLength(0);
+                        //int cols = vals.GetLength(1);
+                        //Console.WriteLine(rows + " " + cols);
+                    }
+                }
+            }
+            return rows;
+            //eWS[exl].Range[addr].Value = "hi";
+        }
+
+        private void Find_Columns(string exl)
         {
 
-            ID = eWS[exl].Range["E6", eWS[exl].Range["E6"].End[Excel.XlDirection.xlDown]];
-            ID_values = ID.Value;
-            int IDcnt = ID.Count;
-            IDcnt += 5;
-            char curcol = 'I';
-
-            while (true)
+            Excel.Range usedrng = eWS[exl].UsedRange;
+            List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
+            foreach (string name in names)
             {
-                String colname = eWS[exl].Range[curcol + "5"].Value;
-                if (colname == "소계")
-                    break;
-                else
-                {
-                    columnNames.Add(colname);
-                    colvalues.Add(colname, eWS[exl].Range[curcol + "6: " + curcol + IDcnt.ToString()].Value);
-                    curcol = (char)((int)curcol + 1);
-                }
+                Excel.Range rng = usedrng.Find(name);
+                if (rng != null)
+                    colAddr.Add(name, rng);
+            }
+
+            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+            {
+                Console.WriteLine(item.Key + " " + item.Value.Row + " " + item.Value.Column);
             }
         }
 
-        public void Copy_Paste(string exl)
+        private void FIrst_Column(string exl)
         {
-            Excel.Range colrng = eWS[exl].Range["A1", eWS[exl].Range["A1"].End[Excel.XlDirection.xlToRight]];
-            int colcnt = colrng.Count;
-            foreach (Excel.Range item in colrng)
+            Excel.Range usedrng = eWS[exl].UsedRange;
+            int ccnt = usedrng.Columns.Count;
+            Excel.Range first_col = null;
+            foreach (Excel.Range item in usedrng.Columns)
             {
-                if (item.Text == "사원코드")
+                object[,] temp = item.Value;
+                bool isEmpty = true;
+                foreach (var tval in temp)
                 {
-                    int col = 4;
-                    Console.WriteLine("Found");
-                    foreach (var val in ID_values)
+                    if (tval != null)
                     {
-                        //String r = col.ToString();
-                        item[col.ToString()].Value = val;
-                        col++;
+                        isEmpty = false;
+                        break;
                     }
+                }
+                if (!isEmpty)
+                {
+                    first_col = item;
                     break;
                 }
             }
-            foreach (String colname in columnNames)
+            colAddr.Add("순번", first_col);
+        }
+
+        private void Copy_Paste(string exl)
+        {
+            Excel.Range colrng = eWS[exl].Range["A1", eWS[exl].Range["A1"].End[Excel.XlDirection.xlToRight]];
+            int colcnt = colrng.Count;
+            foreach (KeyValuePair<string, object[,]> item in colvalues)
             {
-                foreach (Excel.Range item in colrng)
+                foreach (Excel.Range rng in colrng)
                 {
-                    if (item.Text == colname)
+                    if (mapped_table[item.Key].ToString().Equals(rng.Value))
                     {
                         int col = 4;
-                        Console.WriteLine(colname + " Found");
-                        foreach (var val in colvalues[colname])
+                        Console.WriteLine(item.Key + " is Found");
+                        foreach (var val in item.Value)
                         {
-                            item[col.ToString()].Value = val;
+                            rng[col.ToString()].Value = val;
                             col++;
                         }
                         break;
@@ -109,9 +235,38 @@ namespace tempproj
             }
         }
 
-        public void Save(string exl, string path)
+        private void Brush(string exl)
         {
-            eWB[exl].SaveAs(path);
+            Excel.Range usedrng = eWS[exl].UsedRange.Rows.Offset[3];
+            Stack<Excel.Range> deleted = new Stack<Excel.Range>();
+            //int rcnt = usedrng.Rows.Count;
+            foreach (Excel.Range item in usedrng)
+            {
+                string ssn = item.Cells[1, 1].Value;
+
+                if (ssn != null)
+                {
+                    Regex regex = new Regex(@"^[A-Z]{3}");
+                    if (!regex.IsMatch(ssn))
+                    {
+                        //Console.WriteLine("MissMatch   " + item.Address );
+                        //item.Delete();
+                        deleted.Push(item);
+
+                    }
+                }
+                else
+                {
+                    //Console.WriteLine("null  " + item.Address);
+                    //item.Delete();
+                    deleted.Push(item);
+                }
+            }
+            foreach (Excel.Range row in deleted)
+            {
+                row.Delete();
+            }
+
         }
 
         public void Close() //열려있는 모든 excel 객체 해제
