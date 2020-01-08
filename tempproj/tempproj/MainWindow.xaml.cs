@@ -200,7 +200,7 @@ namespace tempproj
 
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        Exception ErrorCode = excelActivity.Work(path, templatePath, savePath);
+                        Exception ErrorCode = excelActivity.Work(path, templatePath, savePath, null);
 
                         if (ErrorCode != null)
                         {
