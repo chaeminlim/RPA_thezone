@@ -171,14 +171,33 @@ namespace tempproj
 
         private void Find_Columns(string exl)
         {
-
+            Excel.Range currentFind = null;
+            Excel.Range firstFind = null;
             Excel.Range usedrng = eWS[exl].UsedRange;
+            int colcnt = usedrng.Columns.Count;
             List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
             foreach (string name in names)
             {
+
                 Excel.Range rng = usedrng.Find(name);
+
                 if (rng != null)
+                {
                     colAddr.Add(name, rng);
+                    currentFind = usedrng.Find(name, Type.Missing, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
+                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, false, Type.Missing, Type.Missing);
+                    Console.WriteLine(name);
+                    Console.WriteLine(colcnt + " " + currentFind.Column);
+                    while (colcnt >= currentFind.Column)
+                    {
+                        //Console.WriteLine("??");
+                        if (currentFind != null)
+                            Console.WriteLine(currentFind.Address);
+                        currentFind = rng.FindNext(currentFind);
+
+                    }
+                }
+
             }
 
             foreach (KeyValuePair<string, Excel.Range> item in colAddr)
