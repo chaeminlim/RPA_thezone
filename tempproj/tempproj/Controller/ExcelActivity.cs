@@ -320,6 +320,11 @@ namespace tempproj
 
         }
 
+        private void Save(string exl, string savepath)
+        {
+            eWS[exl].SaveAs(savepath);
+        }
+
         public void Close() //열려있는 모든 excel 객체 해제
         {
             foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
