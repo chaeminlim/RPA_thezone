@@ -61,10 +61,11 @@ namespace tempproj
         private void InitAnnoucement()
         {
             AnnouncementTextBlock.Text = @"<프로그램 사용법>
-이 프로그램은 관리자 권한으로 실행되어야 합니다.
-1. OpenFile 버튼을 눌러 작업할 엑셀 파일을 지정하세요.
-2. 상단 리스트 박스에 파일 경로가 업로드 되었다면 파일이 지정된 것입니다.
-3. 작업을 진행하기 전에 엑셀 파일을 닫아주어야 합니다.
+1. 더존 엑셀 파일 불러오기 버튼을 눌러 급여수당일괄업로드 엑셀 파일을 지정하세요.
+2. 엑셀 파일 불러오기 버튼을 눌러 작업할 엑셀 파일을 불러오세요.
+3. 콤보 박스를 이용해 회사 이름을 지정하세요.
+4. 엑셀 작업 시작하기를 눌러 작업을 진행하세요. 좌측 하단에 작업이 완료되었음을 알리는 문구가 나타나기 전까지 프로그램을 종료하지 마세요.
+5. 작업 대상의 엑셀 파일들은 프로그램 시작 전 닫아주세요.
 ";
         }
 
@@ -170,50 +171,51 @@ namespace tempproj
                 string templatePath = (string)ExcelTemplateView.SelectedItem;
                 if (templatePath == null)
                 {
-                    WriteDebugLine("템플릿 파일이 로드되지 않았습니다.");
+                    MessageBox.Show("탬플릿 파일이 선택되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
-                    if(dataStruct.jObject == null)
+                    if (dataStruct.jObject == null)
                     {
-                        WriteDebugLine("회사명이 선택되지 않았습니다.");
+                        MessageBox.Show("회사가 선택되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                         ClearAllCurrentQueueData();
                         return;
                     }
+                }
+                
 
+                foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
+                {
+                
                     string extension = System.IO.Path.GetExtension(templatePath);
                     string savePath = System.IO.Path.GetFileNameWithoutExtension(dataStruct.PathInfo);
                     
                     savePath = System.IO.Path.GetFullPath(dataStruct.PathInfo)  + savePath + "_수정본";
                     savePath += extension;
 
+                    WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
 
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        Debug.WriteLine(dataStruct.PathInfo);
-                        Debug.WriteLine(templatePath);
-                        Debug.WriteLine(savePath);
-                        Debug.WriteLine(dataStruct.jObject.ToString());
-                        
                         Exception ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
-
+                        
                         if (ErrorCode != null)
                         {
-                            ClearAllCurrentQueueData(0 );
-                            WriteDebugLine(ErrorCode.ToString());
+                            ClearAllCurrentQueueData(0);
+                            MessageBox.Show("에러로 인해 중지되었습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                             return;
                         }
                         
+                        ExcelWorkEndView.Items.Add(savePath);
                     }));
-
-                    ExcelWorkEndView.Items.Add(savePath);
-                }
-
+                }     
+                
                 ClearAllCurrentQueueData(0);
-                WriteDebugLine("Job done");
 
+                MessageBox.Show("작업이 끝났습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                
             }
         }
 
@@ -244,10 +246,11 @@ namespace tempproj
             if (openFileDialog.ShowDialog() == false)
                 return;
 
+            ExcelTemplateView.Items.Clear();
+
             foreach (string filename in openFileDialog.FileNames)
             {
                 ExcelTemplateView.Items.Add(filename);
-
             }
         }
 
@@ -274,6 +277,7 @@ namespace tempproj
 
 
             List<string> clientNames = new List<string>();
+            
             try
             {
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
@@ -296,11 +300,15 @@ namespace tempproj
                 return;
             }
 
-            ///
 
             foreach (string filename in openFileDialog.FileNames)
             {
+                if (ExcelListView.Items.Contains(filename))
+                {
+                    continue;
+                }
                 ExcelWorkQueueDataStruct dataStructObj = new ExcelWorkQueueDataStruct(filename, clientNames);
+                
                 ExcelListView.Items.Add(dataStructObj);
                 ExcelWorkQueue.Add(dataStructObj);
 
