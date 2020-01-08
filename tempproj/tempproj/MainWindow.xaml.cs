@@ -21,7 +21,7 @@ using System.Diagnostics;
 using tempproj.Controller;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using System.Collections.ObjectModel;
 
 namespace tempproj
 {
@@ -33,13 +33,17 @@ namespace tempproj
         private MainController MainControllerObject;
         private ContextController contextController;
         private ExcelActivity excelActivity;
+        private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
+        private string path = @"..\..\..\MappingInfo.json";
 
         public MainWindow()
         {
             InitializeComponent();
             InitAnnoucement();
             InitContext();
+            InitExcelContext();
         }
+
 
         public void WriteDebugLine(string text)
         {
@@ -65,26 +69,11 @@ namespace tempproj
         }
 
 
-        private void btnOpenFile_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls";
-            openFileDialog.Multiselect = true;
 
-
-            if (openFileDialog.ShowDialog() == false)
-                return;
-
-            foreach(string filename in openFileDialog.FileNames)
-            {
-                ExcelListView.Items.Add(filename);
-                
-            }
-        }
           
         private void ClearListBox_Click(object sender, RoutedEventArgs e)
         {
-            ExcelListView.Items.Clear();
+            ClearAllCurrentQueueData();
         }
 
         private void btnStartWorkflow_Click(object sender, RoutedEventArgs e)
@@ -185,34 +174,64 @@ namespace tempproj
                     return;
                 }
 
-                foreach (String path in ExcelListView.Items)
+                foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
-                    string extension = System.IO.Path.GetExtension(templatePath);
-                    string savePath = System.IO.Path.GetFileNameWithoutExtension(path);
-                    
-                    savePath = System.IO.Path.GetFullPath(path)  + savePath + "_수정본";
-                    savePath += extension;
+                    if(dataStruct.jObject == null)
+                    {
+                        WriteDebugLine("회사명이 선택되지 않았습니다.");
+                        ClearAllCurrentQueueData();
+                        return;
+                    }
 
-                    Debug.WriteLine(path);
-                    Debug.WriteLine(templatePath);
-                    Debug.WriteLine(savePath);
+                    string extension = System.IO.Path.GetExtension(templatePath);
+                    string savePath = System.IO.Path.GetFileNameWithoutExtension(dataStruct.PathInfo);
+                    
+                    savePath = System.IO.Path.GetFullPath(dataStruct.PathInfo)  + savePath + "_수정본";
+                    savePath += extension;
 
 
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        Exception ErrorCode = excelActivity.Work(path, templatePath, savePath, null);
+                        Debug.WriteLine(dataStruct.PathInfo);
+                        Debug.WriteLine(templatePath);
+                        Debug.WriteLine(savePath);
+                        Debug.WriteLine(dataStruct.jObject.ToString());
+                        
+                        Exception ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
 
                         if (ErrorCode != null)
                         {
+                            ClearAllCurrentQueueData(0 );
                             WriteDebugLine(ErrorCode.ToString());
                             return;
                         }
+                        
                     }));
 
                     ExcelWorkEndView.Items.Add(savePath);
                 }
 
+                ClearAllCurrentQueueData(0);
                 WriteDebugLine("Job done");
+
+            }
+        }
+
+        private void ClearAllCurrentQueueData()
+        {
+            ExcelWorkEndView.Items.Clear();
+            ExcelWorkQueue.Clear();
+            ExcelTemplateView.Items.Clear();
+            ExcelListView.Items.Clear();
+        }
+        private void ClearAllCurrentQueueData(int i)
+        {
+            if(i == 0)
+            {
+                ExcelWorkQueue.Clear();
+                ExcelTemplateView.Items.Clear();
+                ExcelListView.Items.Clear();
+
             }
         }
 
@@ -240,6 +259,105 @@ namespace tempproj
                 mappingTable.ShowDialog();
             }
             catch (System.InvalidOperationException) { MessageBox.Show("더블클릭은 안됩니다"); } //더블클릭 Exception 방지
+        }
+
+        private void btnOpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls";
+            openFileDialog.Multiselect = true;
+
+
+            if (openFileDialog.ShowDialog() == false)
+                return;
+            ///
+
+
+            List<string> clientNames = new List<string>();
+            try
+            {
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject object1 = (JObject)JToken.ReadFrom(reader);
+                    List<string> clientList = object1.Properties().Select(p => p.Name).ToList();
+
+                    foreach (string clientName in clientList)
+                    {
+                        clientNames.Add(clientName);
+                    }
+
+                    reader.Close();
+                }
+
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return;
+            }
+
+            ///
+
+            foreach (string filename in openFileDialog.FileNames)
+            {
+                ExcelWorkQueueDataStruct dataStructObj = new ExcelWorkQueueDataStruct(filename, clientNames);
+                ExcelListView.Items.Add(dataStructObj);
+                ExcelWorkQueue.Add(dataStructObj);
+
+            }
+        }
+
+        class ExcelWorkQueueDataStruct
+        {
+            public string PathInfo { get; set; }
+            public ObservableCollection<ComboBoxItem> cbItems { get; set; }
+            public JObject jObject { get; set; }
+            public ExcelWorkQueueDataStruct(string path, List<string> clientNames)
+            {
+                PathInfo = path;
+                jObject = null;
+                cbItems = new ObservableCollection<ComboBoxItem>();
+
+                foreach (string s in clientNames)
+                {
+                    cbItems.Add(new ComboBoxItem { Content = s });
+                }
+            }
+
+            
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+            foreach(ExcelWorkQueueDataStruct d in ExcelWorkQueue)
+            {
+                if (d.PathInfo == (string)((ComboBox)sender).Tag)
+                {
+                    d.jObject = GetJObj((string)((ComboBoxItem)((ComboBox)sender).SelectedItem).Content);
+                    break;
+                }
+            }
+        }
+
+        private JObject GetJObj(string key)
+        {
+            
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject object1 = (JObject)JToken.ReadFrom(reader);
+
+                JObject elem = JObject.Parse(object1.SelectToken(key).ToString());
+                
+                reader.Close();
+                return elem;
+            }
+        }
+
+        private void InitExcelContext()
+        {
+            ExcelWorkQueue = new List<ExcelWorkQueueDataStruct>();
         }
     }
 }
