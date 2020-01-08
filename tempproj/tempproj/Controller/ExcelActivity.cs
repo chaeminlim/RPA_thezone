@@ -86,16 +86,29 @@ namespace tempproj
 
 
 
-            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr2)
             {
-                int offset = Find_Entry(exl, item.Value.Row, item.Value.Column); //cell이 병합됬을 경우 시작점 계산
-                string col = GetExcelColumnName(item.Value.Column);
-                int rstart = item.Value.Row + offset;
-                int rend = rstart + rcnt - 1;
-                Console.WriteLine(item.Key + " " + rstart + " " + rend);
-                Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
-                temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
-                colvalues.Add(item.Key, temp.Value);
+                foreach (Excel.Range addr in item.Value)
+                {
+                    int offset = Find_Entry(exl, addr.Address); //cell이 병합됬을 경우 시작점 계산
+
+                    string col = GetExcelColumnName(addr.Column);
+                    int rstart = addr.Row + offset;
+                    int rend = rstart + rcnt - 1;
+                    Console.WriteLine(item.Key + " " + rstart + " " + rend);
+                    Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
+                    temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
+                    if (colvalues2.ContainsKey(item.Key))
+                    {
+                        colvalues2[item.Key].Add(temp.Value);
+                    }
+                    else
+                    {
+                        List<object[,]> rtemp = new List<object[,]>();
+                        rtemp.Add(temp.Value);
+                        colvalues2.Add(item.Key, rtemp);
+                    }
+                }
             }
 
             /*
@@ -146,24 +159,43 @@ namespace tempproj
             return columnName;
         }
 
-        private int Find_Entry(string exl, int r, int c)
+        private int Find_Entry(string exl, string addr)
         {
-            Excel.Range mrng = eWS[exl].Cells[r, c];
+            Excel.Range mrng = eWS[exl].Range[addr];
             bool rg = mrng.MergeCells;
-            int rows = 1;
+            int rows = 1, row, col;
             if (rg)
             {
-                if (eWS[exl].Cells[r, c].MergeCells != null)
+                dynamic mvalue = mrng.MergeArea.Value;
+                object[,] vals = mvalue as object[,];
+                if (vals != null)
                 {
-                    dynamic mvalue = mrng.MergeArea.Value2;
-                    object[,] vals = mvalue as object[,];
-                    if (vals != null)
+                    rows = vals.GetLength(0);
+                    //int cols = vals.GetLength(1);
+                    //Console.WriteLine(rows + " " + cols);
+                }
+            }
+            else
+            {
+                if (mapped_table[mrng.Value].ToString().Equals("사원코드"))
+                {
+                    row = mrng.Row + 1;
+                    col = mrng.Column;
+                    while (eWS[exl].Cells[row, col].Value == null)
                     {
-                        rows = vals.GetLength(0);
-                        //int cols = vals.GetLength(1);
-                        //Console.WriteLine(rows + " " + cols);
+                        row++;
                     }
                 }
+                else
+                {
+                    row = mrng.Row + 1;
+                    col = mrng.Column;
+                    while (!(eWS[exl].Cells[row, col].Value is double))
+                    {
+                        row++;
+                    }
+                }
+                rows = row - mrng.Row;
             }
             return rows;
             //eWS[exl].Range[addr].Value = "hi";
@@ -171,19 +203,40 @@ namespace tempproj
 
         private void Find_Columns(string exl)
         {
-
+            Excel.Range currentFind = null;
             Excel.Range usedrng = eWS[exl].UsedRange;
+            int colcnt = usedrng.Columns.Count;
             List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
+
             foreach (string name in names)
             {
+                List<Excel.Range> addrs = new List<Excel.Range>();
                 Excel.Range rng = usedrng.Find(name);
-                if (rng != null)
-                    colAddr.Add(name, rng);
-            }
 
-            foreach (KeyValuePair<string, Excel.Range> item in colAddr)
+                if (rng != null)
+                {
+                    //colAddr.Add(name, rng);
+                    addrs.Add(rng);
+                    currentFind = usedrng.Find(name, rng, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
+                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, false, Type.Missing, Type.Missing);
+                    if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column)
+                    {
+
+                        Console.WriteLine(name);
+                        Console.WriteLine(rng.Address);
+                        Console.WriteLine(currentFind.Address);
+                        addrs.Add(currentFind);
+                    }
+                    colAddr2.Add(name, addrs);
+                }
+            }
+            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr2)
             {
-                Console.WriteLine(item.Key + " " + item.Value.Row + " " + item.Value.Column);
+                Console.WriteLine(item.Key);
+                foreach (Excel.Range r in item.Value)
+                {
+                    Console.WriteLine(r.Address);
+                }
             }
         }
 
@@ -192,18 +245,28 @@ namespace tempproj
         {
             Excel.Range colrng = eWS[exl].Range["A1", eWS[exl].Range["A1"].End[Excel.XlDirection.xlToRight]];
             int colcnt = colrng.Count;
-            foreach (KeyValuePair<string, object[,]> item in colvalues)
+            foreach (KeyValuePair<string, List<object[,]>> item in colvalues2)
             {
                 foreach (Excel.Range rng in colrng)
                 {
                     if (mapped_table[item.Key].ToString().Equals(rng.Value))
                     {
-                        int col = 4;
-                        Console.WriteLine(item.Key + " is Found");
-                        foreach (var val in item.Value)
+                        foreach (var values in item.Value)
                         {
-                            rng[col.ToString()].Value = val;
-                            col++;
+                            int col = 4;
+                            Console.WriteLine(item.Key + " is Found");
+                            foreach (var val in values)
+                            {
+                                if (!mapped_table[item.Key].ToString().Equals("사원코드") && rng[col.ToString()].Value != null && val != null)
+                                {
+                                    rng[col.ToString()].Value += Math.Truncate((double)val);
+                                }
+                                else if (!mapped_table[item.Key].ToString().Equals("사원코드") && val != null)
+                                    rng[col.ToString()].Value = Math.Truncate((double)val);
+                                else
+                                    rng[col.ToString()].Value = val;
+                                col++;
+                            }
                         }
                         break;
                     }
