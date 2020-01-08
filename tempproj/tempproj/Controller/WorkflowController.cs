@@ -61,13 +61,13 @@ namespace tempproj
             int num;
             AutomationElement ae;
 
-            for (int i = 10; i > 0; i--)
+            for (int i = 5; i > 0; i--)
             {
                 (num, ae) = xmlController.XmlFinder(strXmlData);
 
                 if (num == 0)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(4000);
                 }
                 else if (num == 1)
                 {

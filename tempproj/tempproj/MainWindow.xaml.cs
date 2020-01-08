@@ -21,7 +21,7 @@ using System.Diagnostics;
 using tempproj.Controller;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using System.Collections.ObjectModel;
 
 namespace tempproj
 {
@@ -33,6 +33,14 @@ namespace tempproj
         private MainController MainControllerObject;
         private ContextController contextController;
         private ExcelActivity excelActivity;
+        /// <summary>
+        /// 
+        /// </summary>
+        public ObservableCollection<ComboBoxItem> cbItems { get; set; }
+        private JObject CurrentJsonObj;
+        public ComboBoxItem SelectedcbItem { get; set; }
+
+        private string path = @"..\..\..\MappingInfo.json";
 
         public MainWindow()
         {
@@ -52,6 +60,32 @@ namespace tempproj
         {
             excelActivity = new ExcelActivity();
             contextController = new ContextController();
+
+            DataContext = this;
+
+            cbItems = new ObservableCollection<ComboBoxItem>();
+            try
+            {
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject object1 = (JObject)JToken.ReadFrom(reader);
+                    List<string> clientList = object1.Properties().Select(p => p.Name).ToList();
+
+                    foreach (string clientName in clientList)
+                    {
+                        cbItems.Add(new ComboBoxItem { Content = clientName });
+                    }
+
+                    reader.Close();
+                }
+
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                WriteDebugLine("파일을 찾을 수 없습니다.");
+                return;
+            }
         }
 
         private void InitAnnoucement()
@@ -119,6 +153,9 @@ namespace tempproj
                 foreach (String line in xmllines)
                 {
                     int ErrCode = wf.DoActionXml(line);
+
+                    Thread.Sleep(3000);
+
                     if (ErrCode == 0 || ErrCode >= 2)
                     {
                         WriteDebugLine("Error Code" + ErrCode);
@@ -240,6 +277,22 @@ namespace tempproj
                 mappingTable.ShowDialog();
             }
             catch (System.InvalidOperationException) { MessageBox.Show("더블클릭은 안됩니다"); } //더블클릭 Exception 방지
+        }
+
+        private void ClientTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject object1 = (JObject)JToken.ReadFrom(reader);
+
+                JObject elem = JObject.Parse(object1.SelectToken((string)SelectedcbItem.Content).ToString());
+
+                CurrentJsonObj = elem;
+
+                Debug.WriteLine(CurrentJsonObj.ToString());
+                reader.Close();
+            }
         }
     }
 }
