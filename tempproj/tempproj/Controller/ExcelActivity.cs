@@ -32,7 +32,7 @@ namespace tempproj
         public object[,] ID_values;
 
 
-        public Exception Work(string path01, string path02, JObject json)
+        public Exception Work(string path01, string path02, string savepath, JObject json)
         {
             try
             {
@@ -43,6 +43,7 @@ namespace tempproj
                 Copy_Paste(path02);
                 Brush(path02);
                 //FIrst_Column(path01);
+                Save(path02, savepath);
                 Close();
                 return null;
             }
@@ -186,31 +187,6 @@ namespace tempproj
             }
         }
 
-        private void FIrst_Column(string exl)
-        {
-            Excel.Range usedrng = eWS[exl].UsedRange;
-            int ccnt = usedrng.Columns.Count;
-            Excel.Range first_col = null;
-            foreach (Excel.Range item in usedrng.Columns)
-            {
-                object[,] temp = item.Value;
-                bool isEmpty = true;
-                foreach (var tval in temp)
-                {
-                    if (tval != null)
-                    {
-                        isEmpty = false;
-                        break;
-                    }
-                }
-                if (!isEmpty)
-                {
-                    first_col = item;
-                    break;
-                }
-            }
-            colAddr.Add("순번", first_col);
-        }
 
         private void Copy_Paste(string exl)
         {
@@ -267,6 +243,11 @@ namespace tempproj
                 row.Delete();
             }
 
+        }
+
+        private void Save(string exl, string savepath)
+        {
+            eWS[exl].SaveAs(savepath);
         }
 
         public void Close() //열려있는 모든 excel 객체 해제
