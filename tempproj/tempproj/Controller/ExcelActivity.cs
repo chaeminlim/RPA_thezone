@@ -242,7 +242,6 @@ namespace tempproj
             }
         }
 
-
         private void Copy_Paste(string exl)
         {
             Excel.Range colrng = eWS[exl].Range["A1", eWS[exl].Range["A1"].End[Excel.XlDirection.xlToRight]];
@@ -259,12 +258,23 @@ namespace tempproj
                             Console.WriteLine(item.Key + " is Found");
                             foreach (var val in values)
                             {
-                                if (!mapped_table[item.Key].ToString().Equals("사원코드") && rng[col.ToString()].Value != null && val != null)
+                                if (!mapped_table[item.Key].ToString().Equals("사원코드"))
                                 {
-                                    rng[col.ToString()].Value += Math.Truncate((double)val);
+                                    if (rng[col.ToString()].Value != null)
+                                    {
+                                        if (val != null)
+                                            rng[col.ToString()].Value += Math.Truncate((double)val);
+                                        else
+                                            rng[col.ToString()].Value += 0;
+                                    }
+                                    else
+                                    {
+                                        if (val != null)
+                                            rng[col.ToString()].Value = Math.Truncate((double)val);
+                                        else
+                                            rng[col.ToString()].Value += 0;
+                                    }
                                 }
-                                else if (!mapped_table[item.Key].ToString().Equals("사원코드") && val != null)
-                                    rng[col.ToString()].Value = Math.Truncate((double)val);
                                 else
                                     rng[col.ToString()].Value = val;
                                 col++;
@@ -308,11 +318,6 @@ namespace tempproj
                 row.Delete();
             }
 
-        }
-
-        private void Save(string exl, string savepath)
-        {
-            eWS[exl].SaveAs(savepath);
         }
 
         public void Close() //열려있는 모든 excel 객체 해제
