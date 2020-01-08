@@ -27,6 +27,8 @@ namespace tempproj
         public Dictionary<string, object[,]> colvalues = new Dictionary<string, object[,]>(); //key : column name , value : value of each column
         public Dictionary<string, point> colNames = new Dictionary<string, point>(); //key : column name, key : coordinate of column on excel
         public Dictionary<string, Excel.Range> colAddr = new Dictionary<string, Excel.Range>();
+        public Dictionary<string, List<Excel.Range>> colAddr2 = new Dictionary<string, List<Excel.Range>>();
+        public Dictionary<string, List<object[,]>> colvalues2 = new Dictionary<string, List<object[,]>>();
         public JObject mapped_table = new JObject();
         public Excel.Range eRng, ID;
         public object[,] ID_values;
