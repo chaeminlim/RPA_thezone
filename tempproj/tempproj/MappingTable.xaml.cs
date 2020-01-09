@@ -88,13 +88,32 @@ namespace tempproj
         private void UpdateList()
         {
             List<string> mappingNameList = CurrentJsonObj.Properties().Select(p => p.Name).ToList();
-            List<string> mappingValueList = CurrentJsonObj.Properties().Select(p => (string)p.Value).ToList();
+            List<JToken> mappingValueList = CurrentJsonObj.Properties().Select(p => p.Value).ToList();
 
             MappingDataGrid.Items.Clear();
 
             for (int i = 0; i < mappingNameList.Count; i++)
             {
-                MappingDataGrid.Items.Add(new MappingDataMember(mappingNameList[i], mappingValueList[i], true));
+                try
+                {
+                    MappingDataGrid.Items.Add(new MappingDataMember(true, mappingNameList[i], (string)mappingValueList[i], "", "", "", ""));
+                }
+                catch (System.ArgumentException)
+                {
+                    JObject temp = (JObject)mappingValueList[i];
+                    string ty = (string)temp["구분"];
+                    JArray tyn = (JArray)temp["값"];
+                    var tynn = new StringBuilder();
+                    foreach (string s in tyn)
+                    {
+                        tynn.Append(s + " ");
+                    }
+                    tynn.Remove(tynn.Length-1, 1);
+                    Console.WriteLine(tynn);
+                    string tr = (string)temp["True"];
+                    string fa = (string)temp["False"];
+                    MappingDataGrid.Items.Add(new MappingDataMember(true, mappingNameList[i], "", ty, tynn.ToString(), tr, fa));
+                }
             }
         }
 
@@ -102,10 +121,13 @@ namespace tempproj
         {
             String JKey = FromTextBox.Text;
             String JValue = ToTextBox.Text;
-
+            String JType = TypeTextBox.Text;
+            String JTypeName = TypeNameTextBox.Text;
+            String JTrue = TrueTextBox.Text;
+            String JFalse = FalseTextBox.Text;
             try
             {
-                MappingDataGrid.Items.Add(new MappingDataMember(JKey, JValue, false));
+                MappingDataGrid.Items.Add(new MappingDataMember(false, JKey, JValue, JType, JTypeName, JTrue, JFalse));
             }
             catch (NullReferenceException)
             {
@@ -137,9 +159,32 @@ namespace tempproj
                     CurrentJsonObj.RemoveAll();
                     foreach (MappingDataMember m in MappingDataGrid.Items)
                     {
-                        CurrentJsonObj.Add(m.KeyString, m.ValueString);
-                    }
+                        if(m.ValueString != "" && m.TypeString != "")
+                        {
+                            MessageBox.Show("To값과 Type값은 동시에 있을수 없습니다");
+                            break;
+                        }
+                        if (m.ValueString == "")
+                        {
+                            JArray jt = new JArray();
+                            string[] sa = m.TypeNameString.Split(' ');
+                            foreach (string s in sa)
+                                jt.Add(s);
 
+                            JObject t = new JObject();
+                            t.Add("구분", m.TypeString);
+                            t.Add("값", jt);
+                            t.Add("True", m.TrueString);
+                            t.Add("False", m.FalseString);
+
+                            CurrentJsonObj.Add(m.KeyString, t);
+                        }
+                        else
+                        {
+                            CurrentJsonObj.Add(m.KeyString, m.ValueString);
+                        }
+                    }
+                    
                     JObject object1 = (JObject)JToken.ReadFrom(reader);
                     object1[SelectedcbItem.Content] = CurrentJsonObj;
                     string output = Newtonsoft.Json.JsonConvert.SerializeObject(object1, Newtonsoft.Json.Formatting.Indented);
@@ -158,13 +203,21 @@ namespace tempproj
 
         public class MappingDataMember
         {
-            public MappingDataMember(string keystring, string valuestring, bool isIncluded)
+            public MappingDataMember(bool isIncluded, string keystring, string valuestring, string typestring, string typenamestring, string truestring, string falsestring)
             {
+                IsIncluded = isIncluded;
                 KeyString = keystring;
                 ValueString = valuestring;
-                IsIncluded = isIncluded;
+                TypeString = typestring;
+                TypeNameString = typenamestring;
+                TrueString = truestring;
+                FalseString = falsestring;
             }
 
+            public bool IsIncluded
+            {
+                get; set;
+            }
             public string KeyString
             {
                 get; set;
@@ -173,11 +226,22 @@ namespace tempproj
             {
                 get; set;
             }
-            public bool IsIncluded
+            public string TypeString
             {
                 get; set;
             }
-
+            public string TypeNameString
+            {
+                get; set;
+            }
+            public string TrueString
+            {
+                get; set;
+            }
+            public string FalseString
+            {
+                get; set;
+            }
         }
     }
 }

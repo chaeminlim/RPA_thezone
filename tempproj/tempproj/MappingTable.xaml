@@ -28,15 +28,27 @@
                         <DataGridCheckBoxColumn Header="Included" Binding="{Binding Path=IsIncluded}"></DataGridCheckBoxColumn>
                         <DataGridTextColumn Header="From" Binding="{Binding Path=KeyString}"></DataGridTextColumn>
                         <DataGridTextColumn Header="To" Binding="{Binding Path=ValueString}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Path=TypeString}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="TypeName" Binding="{Binding Path=TypeNameString}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="True" Binding="{Binding Path=TrueString}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="False" Binding="{Binding Path=FalseString}"></DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <Label x:Name="StatusLabel" Content=""></Label>
-                <Label Content="From"></Label>
+                <Label Content="From"/>
                 <TextBox  x:Name="FromTextBox" Background="AliceBlue"></TextBox>
                 <Label Content="To"></Label>
                 <TextBox x:Name="ToTextBox"  Background="AliceBlue"></TextBox>
+                <Label Content="Type"></Label>
+                <TextBox x:Name="TypeTextBox"  Background="AliceBlue"></TextBox>
+                <Label Content="TypeName"></Label>
+                <TextBox x:Name="TypeNameTextBox"  Background="AliceBlue"></TextBox>
+                <Label Content="True"></Label>
+                <TextBox x:Name="TrueTextBox"  Background="AliceBlue"></TextBox>
+                <Label Content="False"></Label>
+                <TextBox x:Name="FalseTextBox"  Background="AliceBlue"></TextBox>
                 <Button x:Name="btn_AddRow" Content="추가하기" Click="btn_AddRow_Click"></Button>
                 <Button x:Name="btn_deleteRow" Content="선택 지우기" Click="btn_deleteRow_Click" ></Button>
                 <Button x:Name="btn_Save" Content="저장하기" Click="btn_Save_Click"></Button>
