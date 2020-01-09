@@ -211,12 +211,13 @@ namespace tempproj
                         
                         ExcelWorkEndView.Items.Add(savePath);
                     }));
+
+                    WriteDebugLine("작업이 끝났습니다.");
                 }     
                 
                 ClearAllCurrentQueueData(0);
 
                 MessageBox.Show("작업이 끝났습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-                
             }
         }
 
@@ -382,17 +383,25 @@ namespace tempproj
                 {
                     string filename = System.IO.Path.GetFileNameWithoutExtension(d.PathInfo);
                     filename = filename.Replace(" ", "");
-                    filename = filename.Remove(filename.LastIndexOf("("), (filename.Length - filename.LastIndexOf("(")));
+                    Console.WriteLine(filename);
 
                     foreach(ComboBoxItem cbi in d.cbItems)
                     {
-                        if(filename.Contains((string)cbi.Content))
+                        string comp = (string)cbi.Content;
+                        int l, c=0;
+                        if (filename.Length > comp.Length) l = comp.Length;
+                        else l = filename.Length;
+
+                        for (int i = 0; i < l; i++)
+                            if (filename[i] == comp[i]) c++;
+                        Console.WriteLine(c);
+                        
+                        if(c >= l/2)
                         {
                             ((ComboBox)sender).SelectedItem = cbi;
                             break;
                         }
                     }
-
                 }
             }
         }
