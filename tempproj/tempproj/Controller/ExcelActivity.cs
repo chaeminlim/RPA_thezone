@@ -42,7 +42,7 @@ namespace tempproj
                 Open(path01); Open(path02);
                 Find_Columns(path01);
                 Read_Column(path01);
-                Copy_Paste(path02);
+                Copy_Paste(path01, path02);
                 Brush(path02);
                 //FIrst_Column(path01);
                 Save(path02, savepath);
@@ -364,22 +364,27 @@ namespace tempproj
 
         public void Close() //열려있는 모든 excel 객체 해제
         {
-            foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
+            try
             {
-                item.Value.Close();
+                foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
+                {
+                    item.Value.Close();
+                }
+                foreach (KeyValuePair<string, Excel.Worksheet> item in eWS)
+                {
+                    ReleaseExcelObject(item.Value);
+                }
+                foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
+                {
+                    ReleaseExcelObject(item.Value);
+                }
+                foreach (KeyValuePair<string, Excel.Application> item in eXL)
+                {
+                    ReleaseExcelObject(item.Value);
+                }
             }
-            foreach (KeyValuePair<string, Excel.Worksheet> item in eWS)
-            {
-                ReleaseExcelObject(item.Value);
-            }
-            foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
-            {
-                ReleaseExcelObject(item.Value);
-            }
-            foreach (KeyValuePair<string, Excel.Application> item in eXL)
-            {
-                ReleaseExcelObject(item.Value);
-            }
+            catch (Exception)
+            { }
         }
         private void ReleaseExcelObject(object obj)
         {
