@@ -204,6 +204,7 @@ namespace tempproj
                         if (ErrorCode != null)
                         {
                             ClearAllCurrentQueueData(0);
+                            MessageBox.Show(ErrorCode.ToString());
                             MessageBox.Show("작업이 중지되었습니다. 매핑테이블을 확인해주세요", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                             return;
                         }

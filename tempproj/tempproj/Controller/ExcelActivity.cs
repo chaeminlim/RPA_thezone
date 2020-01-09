@@ -11,6 +11,8 @@ namespace tempproj
 {
     public class ExcelActivity
     {
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
         public struct point
         {
             public point(int r, int c)
@@ -366,45 +368,42 @@ namespace tempproj
         {
             try
             {
+                uint processId = 0;
                 foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
-                {
-                    item.Value.Close();
-                }
-                foreach (KeyValuePair<string, Excel.Worksheet> item in eWS)
-                {
-                    ReleaseExcelObject(item.Value);
-                }
-                foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
-                {
-                    ReleaseExcelObject(item.Value);
-                }
+                    item.Value.Close(0);
                 foreach (KeyValuePair<string, Excel.Application> item in eXL)
                 {
-                    ReleaseExcelObject(item.Value);
+                    GetWindowThreadProcessId(new IntPtr(item.Value.Hwnd), out processId);
+                    item.Value.Quit();
+                    if (processId != 0)
+                    {
+                        System.Diagnostics.Process excelProcess = System.Diagnostics.Process.GetProcessById((int)processId);
+                        excelProcess.CloseMainWindow();
+                        excelProcess.Refresh();
+                        excelProcess.Kill();
+                    }
                 }
+                foreach (KeyValuePair<string, Excel.Worksheet> item in eWS)
+                    ReleaseExcelObject(item.Value);
+                foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
+                    ReleaseExcelObject(item.Value);
+                foreach (KeyValuePair<string, Excel.Application> item in eXL)
+                    ReleaseExcelObject(item.Value);
+                eWS.Clear();
+                eWB.Clear();
+                eXL.Clear();
+                colvalues.Clear();
+                colNames.Clear();
+                colAddr.Clear();
+                colAddr2.Clear();
+                colvalues2.Clear();
             }
-            catch (Exception)
-            { }
+            catch (Exception) { }
         }
         private void ReleaseExcelObject(object obj)
         {
-            try
-            {
-                if (obj != null)
-                {
-                    Marshal.ReleaseComObject(obj);
-                    obj = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                obj = null;
-                throw ex;
-            }
-            finally
-            {
-                GC.Collect();
-            }
+            Marshal.ReleaseComObject(obj);
+            GC.Collect();
         }
     }
 }
