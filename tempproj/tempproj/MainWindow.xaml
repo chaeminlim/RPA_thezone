@@ -64,7 +64,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <WrapPanel>
-                                    <ComboBox Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
+                                    <ComboBox Loaded="ComboBox_Loaded" Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
                                     <TextBlock Text="{Binding PathInfo}"></TextBlock>
                                 </WrapPanel>
                             </DataTemplate>

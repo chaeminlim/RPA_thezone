@@ -241,7 +241,7 @@ namespace tempproj
         private void BtnOpenTemplateFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls";
+            openFileDialog.Filter = "Excel 97-2003 (*.xls)|*.xls|Excel (*.xlsx)|*.xlsx";
 
 
             if (openFileDialog.ShowDialog() == false)
@@ -342,7 +342,8 @@ namespace tempproj
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+
+
             foreach(ExcelWorkQueueDataStruct d in ExcelWorkQueue)
             {
                 if (d.PathInfo == (string)((ComboBox)sender).Tag)
@@ -371,6 +372,29 @@ namespace tempproj
         private void InitExcelContext()
         {
             ExcelWorkQueue = new List<ExcelWorkQueueDataStruct>();
+        }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            foreach (ExcelWorkQueueDataStruct d in ExcelWorkQueue)
+            {
+                if (d.PathInfo == (string)((ComboBox)sender).Tag)
+                {
+                    string filename = System.IO.Path.GetFileNameWithoutExtension(d.PathInfo);
+                    filename = filename.Replace(" ", "");
+                    filename = filename.Remove(filename.LastIndexOf("("), (filename.Length - filename.LastIndexOf("(")));
+
+                    foreach(ComboBoxItem cbi in d.cbItems)
+                    {
+                        if(filename.Contains((string)cbi.Content))
+                        {
+                            ((ComboBox)sender).SelectedItem = cbi;
+                            break;
+                        }
+                    }
+
+                }
+            }
         }
     }
 }
