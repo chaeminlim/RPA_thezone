@@ -26,11 +26,9 @@ namespace tempproj
         public Dictionary<string, Excel.Application> eXL = new Dictionary<string, Excel.Application>();
         public Dictionary<string, Excel.Workbook> eWB = new Dictionary<string, Excel.Workbook>();
         public Dictionary<string, Excel.Worksheet> eWS = new Dictionary<string, Excel.Worksheet>();
-        public Dictionary<string, object[,]> colvalues = new Dictionary<string, object[,]>(); //key : column name , value : value of each column
         public Dictionary<string, point> colNames = new Dictionary<string, point>(); //key : column name, key : coordinate of column on excel
-        public Dictionary<string, Excel.Range> colAddr = new Dictionary<string, Excel.Range>();
-        public Dictionary<string, List<Excel.Range>> colAddr2 = new Dictionary<string, List<Excel.Range>>();
-        public Dictionary<string, List<object[,]>> colvalues2 = new Dictionary<string, List<object[,]>>();
+        public Dictionary<string, List<Excel.Range>> colAddr = new Dictionary<string, List<Excel.Range>>();
+        public Dictionary<string, List<object[,]>> colvalues = new Dictionary<string, List<object[,]>>(); //key : column name , value : value of each column
         public JObject mapped_table = new JObject();
         public Excel.Range eRng, ID;
         public object[,] ID_values;
@@ -90,7 +88,7 @@ namespace tempproj
 
 
 
-            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr2)
+            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
             {
                 foreach (Excel.Range addr in item.Value)
                 {
@@ -102,15 +100,15 @@ namespace tempproj
                     Console.WriteLine(item.Key + " " + rstart + " " + rend);
                     Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
                     temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
-                    if (colvalues2.ContainsKey(item.Key))
+                    if (colvalues.ContainsKey(item.Key))
                     {
-                        colvalues2[item.Key].Add(temp.Value);
+                        colvalues[item.Key].Add(temp.Value);
                     }
                     else
                     {
                         List<object[,]> rtemp = new List<object[,]>();
                         rtemp.Add(temp.Value);
-                        colvalues2.Add(item.Key, rtemp);
+                        colvalues.Add(item.Key, rtemp);
                     }
                 }
             }
@@ -199,10 +197,10 @@ namespace tempproj
                         Console.WriteLine(currentFind.Address);
                         addrs.Add(currentFind);
                     }
-                    colAddr2.Add(name, addrs);
+                    colAddr.Add(name, addrs);
                 }
             }
-            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr2)
+            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
             {
                 Console.WriteLine(item.Key);
                 foreach (Excel.Range r in item.Value)
@@ -218,7 +216,7 @@ namespace tempproj
             int colcnt = colrng.Count;
             String key = String.Empty;
             Excel.Range rng = null;
-            foreach (KeyValuePair<string, List<object[,]>> item in colvalues2)
+            foreach (KeyValuePair<string, List<object[,]>> item in colvalues)
             {
                 foreach (var values in item.Value) //item.Value => List<object[,]>
                 {
@@ -392,11 +390,9 @@ namespace tempproj
                 eWS.Clear();
                 eWB.Clear();
                 eXL.Clear();
-                colvalues.Clear();
                 colNames.Clear();
                 colAddr.Clear();
-                colAddr2.Clear();
-                colvalues2.Clear();
+                colvalues.Clear();
             }
             catch (Exception) { }
         }
