@@ -106,7 +106,7 @@ namespace tempproj
                     var tynn = new StringBuilder();
                     foreach (string s in tyn)
                     {
-                        tynn.Append(s + " ");
+                        tynn.Append(s + ",");
                     }
                     tynn.Remove(tynn.Length-1, 1);
                     Console.WriteLine(tynn);
@@ -167,7 +167,7 @@ namespace tempproj
                         if (m.ValueString == "")
                         {
                             JArray jt = new JArray();
-                            string[] sa = m.TypeNameString.Split(' ');
+                            string[] sa = m.TypeNameString.Split(',');
                             foreach (string s in sa)
                                 jt.Add(s);
 
