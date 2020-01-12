@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\obj\x64\Debug\
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Debug\
 tempproj
 none
 false
 DEBUG;TRACE
-C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\App.xaml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\App.xaml
 5-1912435198
 
-20-955973047
-22-1859310810
+191605992343
+22904207041
 InputBox.xaml;MainWindow.xaml;MappingTable.xaml;pwdBox.xaml;Recorder.xaml;
 
-True
+False
 

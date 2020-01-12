@@ -78,6 +78,5 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        <ProgressBar x:Name="progressBar" HorizontalAlignment="Right" Height="29" Margin="0,561,0,0" VerticalAlignment="Top" Width="992" Grid.Row="1" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>

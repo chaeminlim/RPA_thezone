@@ -47,10 +47,7 @@ namespace tempproj
 
         public void WriteDebugLine(string text)
         {
-            DebugConsoleBlock.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                DebugConsoleBlock.Text += text + Environment.NewLine;
-            }));
+            DebugConsoleBlock.Text += text + Environment.NewLine;
         }
         private void InitContext()
         {
@@ -202,24 +199,20 @@ namespace tempproj
                     savePath = temp.ToString();
                     Console.WriteLine(savePath);
 
-                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
+
+                    string ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
+                        
+                    if (ErrorCode != null)
                     {
-                        WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
-
-                        Exception ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
+                        ClearAllCurrentQueueData(0);
+                        MessageBox.Show("ErrorCode", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
                         
-                        if (ErrorCode != null)
-                        {
-                            ClearAllCurrentQueueData(0);
-                            MessageBox.Show(ErrorCode.ToString());
-                            MessageBox.Show("작업이 중지되었습니다. 매핑테이블을 확인해주세요", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            return;
-                        }
-                        
-                        ExcelWorkEndView.Items.Add(savePath);
+                    ExcelWorkEndView.Items.Add(savePath);
 
-                        WriteDebugLine("작업이 끝났습니다.");
-                    }));
+                    WriteDebugLine("작업이 끝났습니다.");
                 }     
                 
                 ClearAllCurrentQueueData(0);

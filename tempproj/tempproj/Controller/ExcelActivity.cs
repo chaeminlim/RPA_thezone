@@ -37,27 +37,25 @@ namespace tempproj
                 Checksum(path02);
                 Save(path02, savepath);
             }
-            catch (NullReferenceException e1)
+            catch (NullReferenceException)
             {
                 ex = "Error : Mapping table을 확인해주세요";
             }
-            catch (InvalidCastException e2)
+            catch (InvalidCastException)
             {
                 ex = "Error : Excel File에 필요한 내용만 있는지 확인해주세요";
             }
-            catch (COMException e3)
+            catch (COMException)
             {
                 ex = "Error : 관리자에게 문의하십시오";
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 ex = "Error : 관리자에게 문의하십시오";
             }
-            finally
-            {
-                Close();
-                return ex;
-            }
+
+            Close();
+            return ex;
         }
 
         private void Open(string path, string sheetName = null)
@@ -351,6 +349,8 @@ namespace tempproj
 
         private void Save(string exl, string savepath)
         {
+            if (System.IO.File.Exists(savepath))
+                System.IO.File.Delete(savepath);
             eWS[exl].SaveAs(savepath);
         }
         private void Checksum(string exl)
