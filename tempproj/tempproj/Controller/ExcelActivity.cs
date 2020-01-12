@@ -36,26 +36,34 @@ namespace tempproj
                 Brush(path02);
                 Checksum(path02);
                 Save(path02, savepath);
+                Close();
+                return ex;
             }
             catch (NullReferenceException)
             {
                 ex = "Error : Mapping table을 확인해주세요";
+                Close();
+                return ex;
             }
             catch (InvalidCastException)
             {
                 ex = "Error : Excel File에 필요한 내용만 있는지 확인해주세요";
+                Close();
+                return ex;
             }
             catch (COMException)
             {
                 ex = "Error : 관리자에게 문의하십시오";
+                Close();
+                return ex;
             }
             catch (Exception)
             {
                 ex = "Error : 관리자에게 문의하십시오";
+                Close();
+                return ex;
             }
 
-            Close();
-            return ex;
         }
 
         private void Open(string path, string sheetName = null)

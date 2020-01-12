@@ -22,6 +22,7 @@ using tempproj.Controller;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace tempproj
 {
@@ -172,17 +173,22 @@ namespace tempproj
                     return;
                 }
 
+                if (ExcelWorkQueue.Count == 0)
+                {
+                    MessageBox.Show("회사 파일이 선택되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
                     if (dataStruct.jObject == null)
                     {
                         MessageBox.Show("회사가 선택되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        ClearAllCurrentQueueData();
                         return;
                     }
                 }
-                
 
+                int c = 1;
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
                 
@@ -199,10 +205,13 @@ namespace tempproj
                     savePath = temp.ToString();
                     Console.WriteLine(savePath);
 
-                    WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
+                    WriteDebugLine("작업중입니다.. (" + c + "/" + ExcelWorkQueue.Count + ")");
 
-                    string ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
-                        
+                    string ErrorCode = "";
+                    this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => {
+                        ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
+                    }), DispatcherPriority.ApplicationIdle);
+                    
                     if (ErrorCode != null)
                     {
                         ClearAllCurrentQueueData(0);
@@ -212,7 +221,8 @@ namespace tempproj
                         
                     ExcelWorkEndView.Items.Add(savePath);
 
-                    WriteDebugLine("작업이 끝났습니다.");
+                    WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
+                    c++;
                 }     
                 
                 ClearAllCurrentQueueData(0);
