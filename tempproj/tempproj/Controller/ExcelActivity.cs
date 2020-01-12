@@ -51,7 +51,7 @@ namespace tempproj
             }
             catch (Exception e)
             {
-                ex = ex = "Error : 관리자에게 문의하십시오";
+                ex = "Error : 관리자에게 문의하십시오";
             }
             finally
             {
