@@ -40,9 +40,9 @@ namespace tempproj
                 Close();
                 return ex;
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException e)
             {
-                ex = "Error : Mapping table을 확인해주세요";
+                ex = e.Message.ToString();
                 Close();
                 return ex;
             }
@@ -86,13 +86,13 @@ namespace tempproj
             {
                 check = eWS[center].UsedRange.Find(colname);
                 if (check == null)
-                    throw new NullReferenceException();
+                    throw new NullReferenceException($"{center}의 mapping table에서 {colname}이 없음");
             }
             foreach (string colname in names)
             {
                 check = eWS[thezone].UsedRange.Find(mapped_table[colname].ToString());
                 if (check == null)
-                    throw new NullReferenceException();
+                    throw new NullReferenceException($"{center}의 mapping table에서 {colname}이 없음");
             }
         }
 
