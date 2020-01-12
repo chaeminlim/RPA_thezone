@@ -23,19 +23,20 @@ namespace tempproj
         public int totalrow = 0;
 
 
-        public String Work(string path01, string path02, string savepath, JObject json)
+        public String Work(string center, string thezone, string savepath, JObject json)
         {
             String ex = null;
             try
             {
                 mapped_table = json;
-                Open(path01); Open(path02);
-                Find_Columns(path01);
-                Read_Column(path01);
-                Copy_Paste(path01, path02);
-                Brush(path02);
-                Checksum(path02);
-                Save(path02, savepath);
+                Open(center); Open(thezone);
+                Check_mapping_table(center, thezone);
+                Find_Columns(center);
+                Read_Column(center);
+                Copy_Paste(center, thezone);
+                Brush(thezone);
+                Checksum(thezone);
+                Save(thezone, savepath);
                 Close();
                 return ex;
             }
@@ -77,9 +78,27 @@ namespace tempproj
                 eWS.Add(path, eWB[path].Worksheets.Item[sheetName]);
         }
 
-        private void Read_Column(string exl)
+        private void Check_mapping_table(string center, string thezone) //mapping table
         {
-            Excel.Range usedrng = eWS[exl].UsedRange;
+            List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
+            Excel.Range check = null;
+            foreach (string colname in names)
+            {
+                check = eWS[center].UsedRange.Find(colname);
+                if (check == null)
+                    throw new NullReferenceException();
+            }
+            foreach (string colname in names)
+            {
+                check = eWS[thezone].UsedRange.Find(mapped_table[colname].ToString());
+                if (check == null)
+                    throw new NullReferenceException();
+            }
+        }
+
+        private void Read_Column(string center)
+        {
+            Excel.Range usedrng = eWS[center].UsedRange;
             int rcnt = usedrng.Rows.Count;
             int ccnt = usedrng.Columns.Count;
             int IDcnt = 0; //인원수
@@ -91,12 +110,12 @@ namespace tempproj
             {
                 foreach (Excel.Range addr in item.Value)
                 {
-                    int offset = Find_Entry(exl, addr.Address); //cell이 병합됬을 경우 시작점 계산
+                    int offset = Find_Entry(center, addr.Address); //cell이 병합됬을 경우 시작점 계산
 
                     string col = GetExcelColumnName(addr.Column);
                     int rstart = addr.Row + offset;
                     int rend = rstart + rcnt - 1;
-                    temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
+                    temp = eWS[center].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
                     if (colvalues.ContainsKey(item.Key))
                     {
                         colvalues[item.Key].Add(temp.Value);
@@ -127,9 +146,9 @@ namespace tempproj
             return columnName;
         }
 
-        private int Find_Entry(string exl, string addr)
+        private int Find_Entry(string center, string addr)
         {
-            Excel.Range mrng = eWS[exl].Range[addr];
+            Excel.Range mrng = eWS[center].Range[addr];
             bool rg = mrng.MergeCells;
             int rows = 1, row, col;
             if (rg)
@@ -149,7 +168,7 @@ namespace tempproj
                 {
                     row = mrng.Row + 1;
                     col = mrng.Column;
-                    while (eWS[exl].Cells[row, col].Value == null)
+                    while (eWS[center].Cells[row, col].Value == null)
                     {
                         row++;
                     }
@@ -158,7 +177,7 @@ namespace tempproj
                 {
                     row = mrng.Row + 1;
                     col = mrng.Column;
-                    while (!(eWS[exl].Cells[row, col].Value is double))
+                    while (!(eWS[center].Cells[row, col].Value is double))
                     {
                         row++;
                     }
@@ -169,10 +188,10 @@ namespace tempproj
             //eWS[exl].Range[addr].Value = "hi";
         }
 
-        private void Find_Columns(string exl)
+        private void Find_Columns(string center)
         {
             Excel.Range currentFind = null;
-            Excel.Range usedrng = eWS[exl].UsedRange;
+            Excel.Range usedrng = eWS[center].UsedRange;
             int colcnt = usedrng.Columns.Count;
             List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
 
@@ -204,9 +223,9 @@ namespace tempproj
             }
         }
 
-        private void Copy_Paste(string exl, string exl2)
+        private void Copy_Paste(string center, string thezone)
         {
-            Excel.Range colrng = eWS[exl2].Range["A1", eWS[exl2].Range["A1"].End[Excel.XlDirection.xlToRight]];
+            Excel.Range colrng = eWS[thezone].Range["A1", eWS[thezone].Range["A1"].End[Excel.XlDirection.xlToRight]];
             int colcnt = colrng.Count;
             String key = String.Empty;
             Excel.Range rng = null;
@@ -226,7 +245,7 @@ namespace tempproj
                             }
                             else //Rule 3 적용
                             {
-                                key = Get_Colname(exl, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
+                                key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
                                 if (key == null)
                                 {
                                     row++;
@@ -266,14 +285,14 @@ namespace tempproj
             }
         }
 
-        private String Get_Colname(string exl, string itemkey, int row, JObject json)
+        private String Get_Colname(string center, string itemkey, int row, JObject json) //For Rule 3
         {
             String position, pos, key = null;
             int offset, dest;
             position = json["구분"].ToString();
 
-            Excel.Range prng = eWS[exl].UsedRange.Find(position);
-            offset = Find_Entry(exl, prng.Address); //cell이 병합됬을 경우 시작점 계산
+            Excel.Range prng = eWS[center].UsedRange.Find(position);
+            offset = Find_Entry(center, prng.Address); //cell이 병합됬을 경우 시작점 계산
             dest = prng.Row + offset + row - 4;
             pos = prng.Cells[dest].Value;
 
@@ -321,9 +340,9 @@ namespace tempproj
             return key;
         }
 
-        private void Brush(string exl)
+        private void Brush(string thezone)
         {
-            Excel.Range usedrng = eWS[exl].UsedRange.Rows.Offset[3];
+            Excel.Range usedrng = eWS[thezone].UsedRange.Rows.Offset[3];
             Stack<Excel.Range> deleted = new Stack<Excel.Range>();
             //int rcnt = usedrng.Rows.Count;
             foreach (Excel.Range item in usedrng)
@@ -355,26 +374,26 @@ namespace tempproj
 
         }
 
-        private void Save(string exl, string savepath)
+        private void Save(string thezone, string savepath)
         {
             if (System.IO.File.Exists(savepath))
                 System.IO.File.Delete(savepath);
-            eWS[exl].SaveAs(savepath);
+            eWS[thezone].SaveAs(savepath);
         }
-        private void Checksum(string exl)
+        private void Checksum(string thezone)
         {
 
-            Excel.Range usedrng = eWS[exl].UsedRange;
+            Excel.Range usedrng = eWS[thezone].UsedRange;
             Excel.Range sum = null;
-            sum = eWS[exl].Range["CH4"];
+            sum = eWS[thezone].Range["CH4"];
             Excel.Range employeesum = sum.Resize[totalrow - 4, Type.Missing];
             employeesum.Formula = "=SUM(B4:CF4)";
 
-            sum = eWS[exl].Range["B" + totalrow];
+            sum = eWS[thezone].Range["B" + totalrow];
             Excel.Range categorysum = sum.Resize[Type.Missing, 83];
             categorysum.Formula = "=SUM(B" + 4.ToString() + ":B" + (totalrow - 1).ToString() + ")";
 
-            Excel.Range totalsum = eWS[exl].Range["CH" + totalrow.ToString()];
+            Excel.Range totalsum = eWS[thezone].Range["CH" + totalrow.ToString()];
             string formula = "=SUM(CH4:CH" + (totalrow - 1).ToString() + ", B" + totalrow.ToString() + ":CF" + totalrow.ToString() + ")";
             //Console.WriteLine(formula);
             totalsum.Formula = formula;

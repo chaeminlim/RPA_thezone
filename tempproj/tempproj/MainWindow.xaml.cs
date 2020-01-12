@@ -215,7 +215,7 @@ namespace tempproj
                     if (ErrorCode != null)
                     {
                         ClearAllCurrentQueueData(0);
-                        MessageBox.Show("ErrorCode", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                         
