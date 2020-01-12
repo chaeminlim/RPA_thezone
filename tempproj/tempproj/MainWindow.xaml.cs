@@ -190,15 +190,22 @@ namespace tempproj
                 {
                 
                     string extension = System.IO.Path.GetExtension(templatePath);
-                    string savePath = System.IO.Path.GetFileNameWithoutExtension(dataStruct.PathInfo);
-                    
-                    savePath = System.IO.Path.GetFullPath(dataStruct.PathInfo)  + savePath + "_수정본";
-                    savePath += extension;
+                    string savePath = System.IO.Path.GetFullPath(dataStruct.PathInfo);
+                    string filename = System.IO.Path.GetFileNameWithoutExtension(dataStruct.PathInfo);
 
-                    WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
+                    StringBuilder temp = new StringBuilder(savePath.Remove(savePath.LastIndexOf("\\"), savePath.Length-savePath.LastIndexOf("\\")));
+                    temp.Append("\\작업");
+                    DirectoryInfo di = new DirectoryInfo(temp.ToString());
+                    if (di.Exists == false) di.Create();
+                    temp.Append("\\" + filename + "_수정" + extension);
+
+                    savePath = temp.ToString();
+                    Console.WriteLine(savePath);
 
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
+                        WriteDebugLine("작업중입니다.. 임의로 종료하지 마세요.");
+
                         Exception ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
                         
                         if (ErrorCode != null)
@@ -210,9 +217,9 @@ namespace tempproj
                         }
                         
                         ExcelWorkEndView.Items.Add(savePath);
-                    }));
 
-                    WriteDebugLine("작업이 끝났습니다.");
+                        WriteDebugLine("작업이 끝났습니다.");
+                    }));
                 }     
                 
                 ClearAllCurrentQueueData(0);

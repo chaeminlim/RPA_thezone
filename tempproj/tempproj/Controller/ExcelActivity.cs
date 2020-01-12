@@ -54,9 +54,6 @@ namespace tempproj
                 Close();
                 return e;
             }
-
-
-
         }
 
         private void Open(string path, string sheetName = null)
