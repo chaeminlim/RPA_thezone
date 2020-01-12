@@ -13,25 +13,14 @@ namespace tempproj
     {
         [DllImport("user32.dll", SetLastError = true)]
         static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-        public struct point
-        {
-            public point(int r, int c)
-            {
-                row = r;
-                column = c;
-            }
-            public int row;
-            public int column;
-        };
+
         public Dictionary<string, Excel.Application> eXL = new Dictionary<string, Excel.Application>();
         public Dictionary<string, Excel.Workbook> eWB = new Dictionary<string, Excel.Workbook>();
         public Dictionary<string, Excel.Worksheet> eWS = new Dictionary<string, Excel.Worksheet>();
-        public Dictionary<string, point> colNames = new Dictionary<string, point>(); //key : column name, key : coordinate of column on excel
+        public Dictionary<string, List<object[,]>> colvalues = new Dictionary<string, List<object[,]>>();
         public Dictionary<string, List<Excel.Range>> colAddr = new Dictionary<string, List<Excel.Range>>();
-        public Dictionary<string, List<object[,]>> colvalues = new Dictionary<string, List<object[,]>>(); //key : column name , value : value of each column
         public JObject mapped_table = new JObject();
-        public Excel.Range eRng, ID;
-        public object[,] ID_values;
+        public int totalrow = 0;
 
 
         public Exception Work(string path01, string path02, string savepath, JObject json)
@@ -44,7 +33,7 @@ namespace tempproj
                 Read_Column(path01);
                 Copy_Paste(path01, path02);
                 Brush(path02);
-                //FIrst_Column(path01);
+                Checksum(path02);
                 Save(path02, savepath);
                 Close();
                 return null;
@@ -66,14 +55,6 @@ namespace tempproj
             else                    //workbook 내에 여러 시트중 원하는 시트가 있으면 해당 시트 open
                 eWS.Add(path, eWB[path].Worksheets.Item[sheetName]);
         }
-        private object[,] Read_Range(string exl, string start, string end)
-        {
-            //eWS[exl] = eWB[exl].Worksheets.Item[sheetName];
-            eRng = eWS[exl].get_Range(start, end);
-            return eRng.Value;
-        }
-
-
 
         private void Read_Column(string exl)
         {
@@ -94,8 +75,6 @@ namespace tempproj
                     string col = GetExcelColumnName(addr.Column);
                     int rstart = addr.Row + offset;
                     int rend = rstart + rcnt - 1;
-                    Console.WriteLine(item.Key + " " + rstart + " " + rend);
-                    Console.WriteLine(col + rstart.ToString() + ":" + col + rend.ToString());
                     temp = eWS[exl].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
                     if (colvalues.ContainsKey(item.Key))
                     {
@@ -186,12 +165,9 @@ namespace tempproj
                     //colAddr.Add(name, rng);
                     addrs.Add(rng);
                     currentFind = usedrng.Find(name, rng, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
-                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, false, Type.Missing, Type.Missing);
+                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, true, Type.Missing, Type.Missing);
                     if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column)
                     {
-                        Console.WriteLine(name);
-                        Console.WriteLine(rng.Address);
-                        Console.WriteLine(currentFind.Address);
                         addrs.Add(currentFind);
                     }
                     colAddr.Add(name, addrs);
@@ -215,13 +191,13 @@ namespace tempproj
             Excel.Range rng = null;
             foreach (KeyValuePair<string, List<object[,]>> item in colvalues)
             {
-                foreach (var values in item.Value) //item.Value => List<object[,]>
+                foreach (var values in item.Value) //item.Value.GetType => List<object[,]>
                 {
                     int row = 4;
-                    Console.WriteLine(item.Key + " is Found");
+                    Console.WriteLine("Copy and Paste " + item.Key);
                     foreach (var val in values)
                     {
-                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))
+                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))//사번을 제외한 나머지 항목 붙여넣기
                         {
                             if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
                             {
@@ -229,13 +205,12 @@ namespace tempproj
                             }
                             else //Rule 3 적용
                             {
-                                key = Get_Colname(exl, item.Key, row, (JObject)mapped_table[item.Key]);
+                                key = Get_Colname(exl, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
                                 if (key == null)
                                 {
                                     row++;
                                     continue;
                                 }
-
                                 rng = colrng.Find(key);
                             }
                             if (rng[row.ToString()].Value != null)
@@ -248,19 +223,24 @@ namespace tempproj
                             else
                             {
                                 if (val != null)
+                                {
+                                    //Console.WriteLine("?? : " + val);
                                     rng[row.ToString()].Value = Math.Truncate((double)val);
+
+                                }
                                 else
                                     rng[row.ToString()].Value += 0;
                             }
                         }
-                        else
+                        else //사번 붙여넣기
                         {
                             rng = colrng.Find(mapped_table[item.Key].ToString());
                             rng[row.ToString()].Value = val;
                         }
                         row++;
                     }
-
+                    if (totalrow < row)
+                        totalrow = row;
                 }
             }
         }
@@ -358,7 +338,27 @@ namespace tempproj
         {
             eWS[exl].SaveAs(savepath);
         }
+        private void Checksum(string exl)
+        {
 
+            Excel.Range usedrng = eWS[exl].UsedRange;
+            Excel.Range sum = null;
+            sum = eWS[exl].Range["CH4"];
+            Excel.Range employeesum = sum.Resize[totalrow - 4, Type.Missing];
+            employeesum.Formula = "=SUM(B4:CF4)";
+
+            sum = eWS[exl].Range["B" + totalrow];
+            Excel.Range categorysum = sum.Resize[Type.Missing, 83];
+            categorysum.Formula = "=SUM(B" + 4.ToString() + ":B" + (totalrow - 1).ToString() + ")";
+
+            Excel.Range totalsum = eWS[exl].Range["CH" + totalrow.ToString()];
+            string formula = "=SUM(CH4:CH" + (totalrow - 1).ToString() + ", B" + totalrow.ToString() + ":CF" + totalrow.ToString() + ")";
+            //Console.WriteLine(formula);
+            totalsum.Formula = formula;
+            totalsum.NumberFormat = 0;
+
+
+        }
         public void Close() //열려있는 모든 excel 객체 해제
         {
             try
