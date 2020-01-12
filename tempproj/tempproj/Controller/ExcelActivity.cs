@@ -23,8 +23,9 @@ namespace tempproj
         public int totalrow = 0;
 
 
-        public Exception Work(string path01, string path02, string savepath, JObject json)
+        public String Work(string path01, string path02, string savepath, JObject json)
         {
+            String ex = null;
             try
             {
                 mapped_table = json;
@@ -35,13 +36,27 @@ namespace tempproj
                 Brush(path02);
                 Checksum(path02);
                 Save(path02, savepath);
-                Close();
-                return null;
+            }
+            catch (NullReferenceException e1)
+            {
+                ex = "Error : Mapping table을 확인해주세요";
+            }
+            catch (InvalidCastException e2)
+            {
+                ex = "Error : Excel File에 필요한 내용만 있는지 확인해주세요";
+            }
+            catch (COMException e3)
+            {
+                ex = "Error : 관리자에게 문의하십시오";
             }
             catch (Exception e)
             {
+                ex = ex = "Error : 관리자에게 문의하십시오";
+            }
+            finally
+            {
                 Close();
-                return e;
+                return ex;
             }
         }
 
@@ -387,7 +402,6 @@ namespace tempproj
                 eWS.Clear();
                 eWB.Clear();
                 eXL.Clear();
-                colNames.Clear();
                 colAddr.Clear();
                 colvalues.Clear();
             }
