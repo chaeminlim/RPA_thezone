@@ -27,8 +27,10 @@ namespace tempproj
     public partial class MappingTable : Window
     {
         public ObservableCollection<ComboBoxItem> cbItems { get; set; }
+        public ObservableCollection<ComboBoxItem> TheZoneItems { get; set; }
         private JObject CurrentJsonObj;
         public ComboBoxItem SelectedcbItem { get; set; }
+        public ComboBoxItem SelectedtzItem { get; set; }
 
         private string path = @"..\..\..\MappingInfo.json";
         public MappingTable()
@@ -37,6 +39,7 @@ namespace tempproj
             DataContext = this;
 
             cbItems = new ObservableCollection<ComboBoxItem>();
+            TheZoneItems = new ObservableCollection<ComboBoxItem>();
 
             string result = string.Empty;
 
@@ -50,26 +53,34 @@ namespace tempproj
 
                     foreach (string clientName in clientList)
                     {
-                        cbItems.Add(new ComboBoxItem { Content = clientName });
+                        if(clientName == "TheZone")
+                        {
+                            JArray thez = (JArray)object1[clientName];
+
+                            foreach (string tz in thez)
+                            {
+                                TheZoneItems.Add(new ComboBoxItem { Content = tz });
+                            }
+                        }
+                        else
+                        {
+                            cbItems.Add(new ComboBoxItem { Content = clientName });
+                        }
+                        
                     }
 
                     reader.Close();
                 }
-
             }
             catch (System.IO.FileNotFoundException)
             {
                 StatusLabel.Content = "파일을 찾을 수 없습니다.";
                 return;
             }
-
         }
-
-
 
         private void ClientTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -120,7 +131,7 @@ namespace tempproj
         private void btn_AddRow_Click(object sender, RoutedEventArgs e)
         {
             String JKey = FromTextBox.Text;
-            String JValue = ToTextBox.Text;
+            String JValue = (String)SelectedtzItem.Content;
             String JType = TypeTextBox.Text;
             String JTypeName = TypeNameTextBox.Text;
             String JTrue = TrueTextBox.Text;

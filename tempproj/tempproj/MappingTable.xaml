@@ -5,7 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:tempproj"
         mc:Ignorable="d"
-        Title="MappingTable" Height="450" Width="800">
+        Title="MappingTable" Height="550" Width="900">
+    <Window.Resources>
+        <Style x:Key="MyWaterMarkStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Grid>
+                            <Border Background="AliceBlue" BorderBrush="#FF7D8683" BorderThickness="1"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center" />
+                            <Label Margin="5,0,0,0" x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}" VerticalAlignment="Center"
+                               Visibility="Collapsed" Foreground="Gray" FontFamily="Arial"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Visibility" TargetName="WaterMarkLabel" Value="Visible"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="DimGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -13,8 +40,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel>
-                <ComboBox x:Name="ClientTypeComboBox" ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged">
-                </ComboBox>
+                <ComboBox x:Name="ClientTypeComboBox" ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
@@ -38,17 +64,17 @@
             <StackPanel Grid.Column="1">
                 <Label x:Name="StatusLabel" Content=""></Label>
                 <Label Content="From"/>
-                <TextBox  x:Name="FromTextBox" Background="AliceBlue"></TextBox>
+                <TextBox  x:Name="FromTextBox" Style="{StaticResource MyWaterMarkStyle}" Tag="Center파일의 항목 이름"></TextBox>
                 <Label Content="To"></Label>
-                <TextBox x:Name="ToTextBox"  Background="AliceBlue"></TextBox>
+                <ComboBox x:Name="ToTextBox" ItemsSource="{Binding TheZoneItems}" SelectedItem="{Binding SelectedtzItem}"/>
                 <Label Content="Type"></Label>
-                <TextBox x:Name="TypeTextBox"  Background="AliceBlue"></TextBox>
+                <TextBox x:Name="TypeTextBox" Style="{StaticResource MyWaterMarkStyle}" Tag="확인해야할 항목 이름"></TextBox>
                 <Label Content="TypeName"></Label>
-                <TextBox x:Name="TypeNameTextBox"  Background="AliceBlue"></TextBox>
-                <Label Content="True"></Label>
-                <TextBox x:Name="TrueTextBox"  Background="AliceBlue"></TextBox>
-                <Label Content="False"></Label>
-                <TextBox x:Name="FalseTextBox"  Background="AliceBlue"></TextBox>
+                <TextBox x:Name="TypeNameTextBox" Style="{StaticResource MyWaterMarkStyle}" Tag="일치해야할 값 (, 로 구분)"></TextBox>
+                <Label Content="일치"></Label>
+                <TextBox x:Name="TrueTextBox" Style="{StaticResource MyWaterMarkStyle}" Tag="일치한다면 연결될 TheZone항목 이름"></TextBox>
+                <Label Content="불일치"></Label>
+                <TextBox x:Name="FalseTextBox" Style="{StaticResource MyWaterMarkStyle}" Tag="일치하지 않는다면 연결될 TheZone항목 이름"></TextBox>
                 <Button x:Name="btn_AddRow" Content="추가하기" Click="btn_AddRow_Click"></Button>
                 <Button x:Name="btn_deleteRow" Content="선택 지우기" Click="btn_deleteRow_Click" ></Button>
                 <Button x:Name="btn_Save" Content="저장하기" Click="btn_Save_Click"></Button>
