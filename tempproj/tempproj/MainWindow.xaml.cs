@@ -49,6 +49,8 @@ namespace tempproj
         public void WriteDebugLine(string text)
         {
             DebugConsoleBlock.Text += text + Environment.NewLine;
+
+            this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
         }
         private void InitContext()
         {
@@ -208,21 +210,24 @@ namespace tempproj
                     WriteDebugLine("작업중입니다.. (" + c + "/" + ExcelWorkQueue.Count + ")");
 
                     string ErrorCode = "";
-                    this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => {
-                        ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
-                    }), DispatcherPriority.ApplicationIdle);
+                    ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
                     
                     if (ErrorCode != null)
                     {
-                        ClearAllCurrentQueueData(0);
-                        MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
+                        //ClearAllCurrentQueueData(0);
+                        //MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        WriteDebugLine(ErrorCode);
+                        c++;
+                        continue;
+                    }
+                    else
+                    {
+                        ExcelWorkEndView.Items.Add(savePath);
+
+                        WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
+                        c++;
                     }
                         
-                    ExcelWorkEndView.Items.Add(savePath);
-
-                    WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
-                    c++;
                 }     
                 
                 ClearAllCurrentQueueData(0);
