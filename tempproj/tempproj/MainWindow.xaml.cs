@@ -48,9 +48,9 @@ namespace tempproj
 
         public void WriteDebugLine(string text)
         {
-            this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+            this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
             DebugConsoleBlock.Text += text + Environment.NewLine;
-            this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+            this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
         }
         private void InitContext()
         {
@@ -211,9 +211,9 @@ namespace tempproj
 
                     string ErrorCode = "";
 
-                    this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+                    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
                     ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
-                    this.DebugConsoleBlock.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+                    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
 
                     if (ErrorCode != null)
                     {
@@ -222,11 +222,14 @@ namespace tempproj
                         WriteDebugLine("작업이 비정상적으로 종료되었습니다.");
                         return;
                     }
-                        
-                    ExcelWorkEndView.Items.Add(savePath);
+                    else
+                    {
+                        ExcelWorkEndView.Items.Add(savePath);
 
-                    WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
-                    c++;
+                        WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
+                        c++;
+                    }
+                        
                 }     
                 
                 ClearAllCurrentQueueData(0);
