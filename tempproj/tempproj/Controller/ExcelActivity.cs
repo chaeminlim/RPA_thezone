@@ -86,7 +86,7 @@ namespace tempproj
             {
                 check = eWS[center].UsedRange.Find(colname);
                 if (check == null)
-                    throw new NullReferenceException($"{center}의 mapping table에서 center쪽 {colname}이 없음");
+                    throw new NullReferenceException($"{center}의 mapping table에서 center쪽 {colname} (이/가) 없음");
             }
             foreach (string colname in names)
             {
@@ -101,12 +101,12 @@ namespace tempproj
                     {
                         check = eWS[thezone].UsedRange.Find(temp2);
                         if (check == null)
-                            throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname}이 없음");
+                            throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname} (이/가) 없음");
                     }
                 }
                 check = eWS[thezone].UsedRange.Find(temp);
                 if (check == null)
-                    throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname}이 없음");
+                    throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname} (이/가) 없음");
             }
         }
 

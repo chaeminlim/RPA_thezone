@@ -36,6 +36,7 @@ namespace tempproj
         private ExcelActivity excelActivity;
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
         private string path = @"..\..\..\MappingInfo.json";
+        private double scr = 0;
 
         public MainWindow()
         {
@@ -45,12 +46,19 @@ namespace tempproj
             InitExcelContext();
         }
 
-
+        public void UpdateWindow()
+        {
+            // 화면 객체의 변경사항을 즉시 업데이트한다
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(
+                      System.Windows.Threading.DispatcherPriority.Background,
+                      new System.Threading.ThreadStart(delegate { }));
+        }
         public void WriteDebugLine(string text)
         {
-            this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
             DebugConsoleBlock.Text += text + Environment.NewLine;
-            this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
+            scrollv.ScrollToVerticalOffset(scr);
+            scr += 50;
+            UpdateWindow();
         }
         private void InitContext()
         {
@@ -185,7 +193,7 @@ namespace tempproj
                 {
                     if (dataStruct.jObject == null)
                     {
-                        MessageBox.Show("회사가 선택되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("회사가 선택되지 않았거나,\n중복된 파일을 선택했습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
                 }
@@ -218,17 +226,18 @@ namespace tempproj
                     {
                         //MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                         WriteDebugLine(ErrorCode);
-                        WriteDebugLine("작업이 비정상적으로 종료되었습니다.");
+                        WriteDebugLine("작업이 비정상적으로 종료되었습니다.\n");
                         c++;
                         workFailList.Add(filename);
                         ExcelWorkFailView.Items.Add(savePath);
+                        UpdateWindow();
                         continue;
                     }
                     else
                     {
                         ExcelWorkEndView.Items.Add(savePath);
 
-                        WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
+                        WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")\n");
                         c++;
                     }
                 }
@@ -242,9 +251,10 @@ namespace tempproj
                     temps += s;
                     temps += '\n';
                 }
-                MessageBox.Show("작업이 끝났습니다." +
+                MessageBox.Show("작업이 끝났습니다.\n" +
                     "작업 실패 리스트 : " +
                     temps , "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                WriteDebugLine("================================\n");
             }
         }
 
@@ -262,7 +272,6 @@ namespace tempproj
                 ExcelWorkQueue.Clear();
                 ExcelTemplateView.Items.Clear();
                 ExcelListView.Items.Clear();
-
             }
         }
 
@@ -421,7 +430,6 @@ namespace tempproj
 
                         for (int i = 0; i < l; i++)
                             if (filename[i] == comp[i]) c++;
-                        Console.WriteLine(c);
                         
                         if(c >= l/2)
                         {

@@ -36,21 +36,21 @@
                 <ColumnDefinition Width="2*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
-                <StackPanel>
-                    <Button x:Name="btnOpenTemplateFile" Content="더존 엑셀 파일 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="66,2,65.2,0" Width="200"/>
-                    <Button x:Name="btnOpenFile" Content="엑셀 파일 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="66,2,65.2,0" Width="200"/>
-                    <Button x:Name="btnStartExcelWork" Content="엑셀 작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
-                    <Button x:Name="ClearListBox" Content="작업 대기 큐 비우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
+                <ScrollViewer x:Name="scrollv" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Button x:Name="btnOpenTemplateFile" Content="더존 엑셀 파일 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnOpenFile" Content="엑셀 파일 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnStartExcelWork" Content="엑셀 작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="ClearListBox" Content="작업 대기 큐 비우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
 
-                    <Button x:Name="btnLoadXml" Content="(사용금지)Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"/>
-                    <Button x:Name="btnStartWorkflow" Content="(사용금지)Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnLoadXml" Content="(사용금지)Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnStartWorkflow" Content="(사용금지)Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"/>
 
 
-                    <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"/>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"/>
                         <TextBlock x:Name="DebugConsoleBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Beige"/>
-                    </ScrollViewer>
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
             <Grid Grid.Column="1">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
