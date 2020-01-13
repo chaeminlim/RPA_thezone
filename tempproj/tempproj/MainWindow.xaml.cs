@@ -217,10 +217,11 @@ namespace tempproj
 
                     if (ErrorCode != null)
                     {
-                        ClearAllCurrentQueueData(0);
-                        MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        //MessageBox.Show(ErrorCode, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        WriteDebugLine(ErrorCode);
                         WriteDebugLine("작업이 비정상적으로 종료되었습니다.");
-                        return;
+                        c++;
+                        continue;
                     }
                     else
                     {
@@ -229,7 +230,6 @@ namespace tempproj
                         WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
                         c++;
                     }
-                        
                 }     
                 
                 ClearAllCurrentQueueData(0);
