@@ -36,7 +36,7 @@ namespace tempproj
         private ExcelActivity excelActivity;
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
         private string path = @"..\..\..\MappingInfo.json";
-        private double scr = 0;
+        private double scr = double.MaxValue;
 
         public MainWindow()
         {
@@ -57,7 +57,6 @@ namespace tempproj
         {
             DebugConsoleBlock.Text += text + Environment.NewLine;
             scrollv.ScrollToVerticalOffset(scr);
-            scr += 50;
             UpdateWindow();
         }
         private void InitContext()
