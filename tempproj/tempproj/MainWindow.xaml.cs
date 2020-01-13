@@ -191,6 +191,8 @@ namespace tempproj
                 }
 
                 int c = 1;
+                List<string> workFailList = new List<string>();
+
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
                 
@@ -210,10 +212,7 @@ namespace tempproj
                     WriteDebugLine("작업중입니다.. (" + c + "/" + ExcelWorkQueue.Count + ")");
 
                     string ErrorCode = "";
-
-                    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
                     ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
-                    this.Dispatcher.Invoke((ThreadStart)(() => { }), DispatcherPriority.ApplicationIdle);
 
                     if (ErrorCode != null)
                     {
@@ -221,6 +220,8 @@ namespace tempproj
                         WriteDebugLine(ErrorCode);
                         WriteDebugLine("작업이 비정상적으로 종료되었습니다.");
                         c++;
+                        workFailList.Add(filename);
+                        ExcelWorkFailView.Items.Add(savePath);
                         continue;
                     }
                     else
@@ -233,8 +234,15 @@ namespace tempproj
                 }     
                 
                 ClearAllCurrentQueueData(0);
-
-                MessageBox.Show("작업이 끝났습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string temps = "";
+                foreach(string s in workFailList)
+                {
+                    temps += s;
+                    temps += '\n';
+                }
+                MessageBox.Show("작업이 끝났습니다." +
+                    "작업 실패 리스트." +
+                    temps , "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

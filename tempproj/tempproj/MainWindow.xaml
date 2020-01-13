@@ -72,6 +72,8 @@
                     </ListView>
                     <Label x:Name="ExcelWorkEndLabel" Content="엑셀 작업 완료 리스트"></Label>
                     <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                    <Label x:Name="ExcelWorkFailLabel" Content="엑셀 작업 실패 리스트"></Label>
+                    <ListView x:Name="ExcelWorkFailView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
 
                     <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
                     <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
