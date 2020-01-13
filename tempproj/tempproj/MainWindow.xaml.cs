@@ -195,12 +195,12 @@ namespace tempproj
 
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
-                
+
                     string extension = System.IO.Path.GetExtension(templatePath);
                     string savePath = System.IO.Path.GetFullPath(dataStruct.PathInfo);
                     string filename = System.IO.Path.GetFileNameWithoutExtension(dataStruct.PathInfo);
 
-                    StringBuilder temp = new StringBuilder(savePath.Remove(savePath.LastIndexOf("\\"), savePath.Length-savePath.LastIndexOf("\\")));
+                    StringBuilder temp = new StringBuilder(savePath.Remove(savePath.LastIndexOf("\\"), savePath.Length - savePath.LastIndexOf("\\")));
                     temp.Append("\\작업");
                     DirectoryInfo di = new DirectoryInfo(temp.ToString());
                     if (di.Exists == false) di.Create();
@@ -231,17 +231,19 @@ namespace tempproj
                         WriteDebugLine("작업이 끝났습니다. (" + c + "/" + ExcelWorkQueue.Count + ")");
                         c++;
                     }
-                }     
-                
+                }
+
                 ClearAllCurrentQueueData(0);
                 string temps = "";
+                if (workFailList.Count == 0)
+                    temps = "없음";
                 foreach(string s in workFailList)
                 {
                     temps += s;
                     temps += '\n';
                 }
                 MessageBox.Show("작업이 끝났습니다." +
-                    "작업 실패 리스트." +
+                    "작업 실패 리스트 : " +
                     temps , "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }

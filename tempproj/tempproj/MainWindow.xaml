@@ -47,37 +47,41 @@
 
 
                     <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"/>
-                    <TextBlock x:Name="DebugConsoleBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Beige"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="DebugConsoleBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Beige"/>
+                    </ScrollViewer>
                 </StackPanel>
             </Grid>
             <Grid Grid.Column="1">
-                <StackPanel Margin="10, 10, 20, 10">
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type ListBox}">
-                            <Setter Property="Margin" Value="0,10,0,0"></Setter>
-                        </Style>
-                    </StackPanel.Resources>
-                    <Label x:Name="ExcelTemplateViewLabel" Content="엑셀 탬플릿 (급여수당일괄업로드 )"></Label>
-                    <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                    <Label x:Name="ExcelListViewLabel" Content="엑셀 작업 대기 리스트"></Label>
-                    <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <WrapPanel>
-                                    <ComboBox Loaded="ComboBox_Loaded" Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
-                                    <TextBlock Text="{Binding PathInfo}"></TextBlock>
-                                </WrapPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    <Label x:Name="ExcelWorkEndLabel" Content="엑셀 작업 완료 리스트"></Label>
-                    <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                    <Label x:Name="ExcelWorkFailLabel" Content="엑셀 작업 실패 리스트"></Label>
-                    <ListView x:Name="ExcelWorkFailView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="10, 10, 20, 10">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type ListBox}">
+                                <Setter Property="Margin" Value="0,10,0,0"></Setter>
+                            </Style>
+                        </StackPanel.Resources>
+                        <Label x:Name="ExcelTemplateViewLabel" Content="엑셀 탬플릿 (급여수당일괄업로드 )"></Label>
+                        <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                        <Label x:Name="ExcelListViewLabel" Content="엑셀 작업 대기 리스트"></Label>
+                        <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <WrapPanel>
+                                        <ComboBox Loaded="ComboBox_Loaded" Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
+                                        <TextBlock Text="{Binding PathInfo}"></TextBlock>
+                                    </WrapPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Label x:Name="ExcelWorkEndLabel" Content="엑셀 작업 완료 리스트"></Label>
+                        <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                        <Label x:Name="ExcelWorkFailLabel" Content="엑셀 작업 실패 리스트"></Label>
+                        <ListView x:Name="ExcelWorkFailView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
 
-                    <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
-                    <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                </StackPanel>
+                        <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
+                        <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Grid>
