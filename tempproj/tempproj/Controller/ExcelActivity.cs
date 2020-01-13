@@ -90,7 +90,21 @@ namespace tempproj
             }
             foreach (string colname in names)
             {
-                check = eWS[thezone].UsedRange.Find(mapped_table[colname].ToString());
+                string temp = mapped_table[colname].ToString();
+                string temp2 = null;
+                if (mapped_table[colname].GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                {
+                    JObject t = (JObject)mapped_table[colname];
+                    temp = t["True"].ToString();
+                    temp2 = t["False"].ToString();
+                    if(temp2 != null)
+                    {
+                        check = eWS[thezone].UsedRange.Find(temp2);
+                        if (check == null)
+                            throw new NullReferenceException($"{center}의 mapping table에서 {colname}이 없음");
+                    }
+                }
+                check = eWS[thezone].UsedRange.Find(temp);
                 if (check == null)
                     throw new NullReferenceException($"{center}의 mapping table에서 {colname}이 없음");
             }
