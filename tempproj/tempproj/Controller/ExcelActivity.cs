@@ -251,50 +251,27 @@ namespace tempproj
                     Console.WriteLine("Copy and Paste " + item.Key);
                     foreach (var val in values)
                     {
-                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))//사번을 제외한 나머지 항목 붙여넣기
-                        {
-                            if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
-                            {
-                                rng = colrng.Find(mapped_table[item.Key].ToString());
-                            }
-                            else //Rule 3 적용
-                            {
-                                key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
-                                if (key == null)
-                                {
-                                    row++;
-                                    continue;
-                                }
-                                rng = colrng.Find(key);
-                            }
-                            if (rng[row.ToString()].Value != null)
-                            {
-                                if (val != null)
-                                    rng[row.ToString()].Value += Math.Truncate((double)val);
-                                else
-                                    rng[row.ToString()].Value += 0;
-                            }
-                            else
-                            {
-                                if (val != null)
-                                {
-                                    //Console.WriteLine("?? : " + val);
-                                    rng[row.ToString()].Value = Math.Truncate((double)val);
-
-                                }
-                                else
-                                    rng[row.ToString()].Value += 0;
-                            }
-                        }
-                        else //사번 붙여넣기
+                        if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
                         {
                             rng = colrng.Find(mapped_table[item.Key].ToString());
-                            rng[row.ToString()].Value = val;
                         }
+                        else //Rule 3 적용
+                        {
+                            key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
+
+                            rng = colrng.Find(key);
+                        }
+                        if (key == null)
+                        {
+                            row++;
+                            continue;
+                        }
+                        rng[row.ToString()].Value = val;
                         row++;
                     }
-                    if (totalrow < row)
+                    if (totalrow < row) //UsedRange의 Rows.Count가 정확하지 않아서 totalrow 변수를 이용해 row개수 구함
                         totalrow = row;
+
                 }
             }
         }
@@ -357,6 +334,9 @@ namespace tempproj
         private void Brush(string thezone)
         {
             Excel.Range usedrng = eWS[thezone].UsedRange.Rows.Offset[3];
+            int rcnt = usedrng.Rows.Count;
+            int ccnt = usedrng.Columns.Count;
+            Console.WriteLine(rcnt + " " + ccnt);
             Stack<Excel.Range> deleted = new Stack<Excel.Range>();
             //int rcnt = usedrng.Rows.Count;
             foreach (Excel.Range item in usedrng)
@@ -368,22 +348,27 @@ namespace tempproj
                     Regex regex = new Regex(@"^[A-Z]{3}");
                     if (!regex.IsMatch(ssn))
                     {
-                        //Console.WriteLine("MissMatch   " + item.Address );
-                        //item.Delete();
                         deleted.Push(item);
-
                     }
                 }
                 else
                 {
-                    //Console.WriteLine("null  " + item.Address);
-                    //item.Delete();
                     deleted.Push(item);
                 }
             }
             foreach (Excel.Range row in deleted)
             {
                 row.Delete();
+            }
+            for (int r = 1; r < rcnt; r++)
+            {
+                for (int c = 2; c < ccnt; c++)
+                {
+                    if (usedrng.Cells[r, c].Value != null && usedrng.Cells[r, c].Value is double)
+                    {
+                        usedrng.Cells[r, c].Value = Math.Truncate((double)usedrng.Cells[r, c].Value);
+                    }
+                }
             }
 
         }
