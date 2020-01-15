@@ -33,7 +33,7 @@ namespace tempproj
                 Check_mapping_table(center, thezone);
                 Find_Columns(center);
                 Read_Column(center);
-                Copy_Paste(center, thezone);
+                Paste(center, thezone);
                 Brush(thezone);
                 Checksum(thezone);
                 Save(thezone, savepath);
@@ -97,7 +97,7 @@ namespace tempproj
                     JObject t = (JObject)mapped_table[colname];
                     temp = t["True"].ToString();
                     temp2 = t["False"].ToString();
-                    if(temp2 != null)
+                    if (temp2 != null)
                     {
                         check = eWS[thezone].UsedRange.Find(temp2);
                         if (check == null)
@@ -237,7 +237,7 @@ namespace tempproj
             }
         }
 
-        private void Copy_Paste(string center, string thezone)
+        private void Paste(string center, string thezone)
         {
             Excel.Range colrng = eWS[thezone].Range["A1", eWS[thezone].Range["A1"].End[Excel.XlDirection.xlToRight]];
             int colcnt = colrng.Count;
@@ -251,22 +251,46 @@ namespace tempproj
                     Console.WriteLine("Copy and Paste " + item.Key);
                     foreach (var val in values)
                     {
-                        if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
+                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))//사번을 제외한 나머지 항목 붙여넣기
+                        {
+                            if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
+                            {
+                                rng = colrng.Find(mapped_table[item.Key].ToString());
+                            }
+                            else //Rule 3 적용
+                            {
+                                key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
+                                if (key == null)
+                                {
+                                    row++;
+                                    continue;
+                                }
+                                rng = colrng.Find(key);
+                            }
+                            if (rng[row.ToString()].Value != null)
+                            {
+                                if (val != null)
+                                    rng[row.ToString()].Value += (double)val;
+                                else
+                                    rng[row.ToString()].Value += 0;
+                            }
+                            else
+                            {
+                                if (val != null)
+                                {
+                                    //Console.WriteLine("?? : " + val);
+                                    rng[row.ToString()].Value = (double)val;
+
+                                }
+                                else
+                                    rng[row.ToString()].Value += 0;
+                            }
+                        }
+                        else //사번 붙여넣기
                         {
                             rng = colrng.Find(mapped_table[item.Key].ToString());
+                            rng[row.ToString()].Value = val;
                         }
-                        else //Rule 3 적용
-                        {
-                            key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
-
-                            rng = colrng.Find(key);
-                        }
-                        if (key == null)
-                        {
-                            row++;
-                            continue;
-                        }
-                        rng[row.ToString()].Value = val;
                         row++;
                     }
                     if (totalrow < row) //UsedRange의 Rows.Count가 정확하지 않아서 totalrow 변수를 이용해 row개수 구함
@@ -334,6 +358,8 @@ namespace tempproj
         private void Brush(string thezone)
         {
             Excel.Range usedrng = eWS[thezone].UsedRange.Rows.Offset[3];
+            //Excel.Range truncaterng = eWS[thezone].UsedRange.Offset[3, 1];
+
             int rcnt = usedrng.Rows.Count;
             int ccnt = usedrng.Columns.Count;
             Console.WriteLine(rcnt + " " + ccnt);
@@ -360,6 +386,8 @@ namespace tempproj
             {
                 row.Delete();
             }
+
+
         }
 
         private void Save(string thezone, string savepath)
@@ -375,14 +403,14 @@ namespace tempproj
             Excel.Range sum = null;
             sum = eWS[thezone].Range["CH4"];
             Excel.Range employeesum = sum.Resize[totalrow - 4, Type.Missing];
-            employeesum.Formula = "=SUM(B4:CF4)";
+            employeesum.Formula = "=ROUND(SUM(B4:CF4), 0)";
 
             sum = eWS[thezone].Range["B" + totalrow];
             Excel.Range categorysum = sum.Resize[Type.Missing, 83];
-            categorysum.Formula = "=SUM(B" + 4.ToString() + ":B" + (totalrow - 1).ToString() + ")";
+            categorysum.Formula = "=ROUND(SUM(B" + 4.ToString() + ":B" + (totalrow - 1).ToString() + "), 0)";
 
             Excel.Range totalsum = eWS[thezone].Range["CH" + totalrow.ToString()];
-            string formula = "=SUM(CH4:CH" + (totalrow - 1).ToString() + ", B" + totalrow.ToString() + ":CF" + totalrow.ToString() + ")";
+            string formula = "=ROUND(SUM(CH4:CH" + (totalrow - 1).ToString() + ", B" + totalrow.ToString() + ":CF" + totalrow.ToString() + "), 2)";
             //Console.WriteLine(formula);
             totalsum.Formula = formula;
             totalsum.NumberFormat = 0;
