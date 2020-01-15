@@ -360,17 +360,6 @@ namespace tempproj
             {
                 row.Delete();
             }
-            for (int r = 1; r < rcnt; r++)
-            {
-                for (int c = 2; c < ccnt; c++)
-                {
-                    if (usedrng.Cells[r, c].Value != null && usedrng.Cells[r, c].Value is double)
-                    {
-                        usedrng.Cells[r, c].Value = Math.Truncate((double)usedrng.Cells[r, c].Value);
-                    }
-                }
-            }
-
         }
 
         private void Save(string thezone, string savepath)
