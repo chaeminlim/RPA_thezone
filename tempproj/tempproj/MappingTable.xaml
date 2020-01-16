@@ -40,7 +40,8 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <StackPanel>
-                <ComboBox x:Name="ClientTypeComboBox" ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged"/>
+                <ComboBox x:Name="ClientTypeComboBox"  ItemsSource="{Binding cbItems}" SelectedItem="{Binding SelectedcbItem}" SelectionChanged="ClientTypeComboBox_SelectionChanged"/>
+                <Label Content="위 박스에서 회사를 선택하세요" HorizontalAlignment="Right"/>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">

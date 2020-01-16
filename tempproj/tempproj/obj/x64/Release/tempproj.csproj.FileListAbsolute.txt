@@ -37,3 +37,30 @@ C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Rel
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.g.cs
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.baml
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.CopyComplete
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\tempproj.exe.config
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\tempproj.exe
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\tempproj.pdb
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\Newtonsoft.Json.dll
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Release\Newtonsoft.Json.xml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csprojAssemblyReference.cache
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.ResolveComReference.cache
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\InputBox.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MainWindow.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\pwdBox.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\Recorder.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\App.g.cs
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj_MarkupCompile.cache
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj_MarkupCompile.lref
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\InputBox.baml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MainWindow.baml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\MappingTable.baml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\pwdBox.baml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\Recorder.baml
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.g.resources
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.Properties.Resources.resources
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.GenerateResource.cache
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.CoreCompileInputs.cache
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.csproj.CopyComplete
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.exe
+C:\Users\강신혁\Documents\GitHub\RPA_thezone\tempproj\tempproj\obj\x64\Release\tempproj.pdb

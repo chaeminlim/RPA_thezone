@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:tempproj"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="1000">
+        Title="Converting Process Automation" Height="650" Width="1000">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type Button}">
@@ -26,8 +26,6 @@
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <ToolBar>
                 <Button x:Name="btn_MappingTable" Content="매핑 테이블 수정하기" Click="btn_MappingTable_Click"></Button>
-                <Button x:Name="Recorder" Content="개발자도구"  Click="Recorder_Click" Height="20" />
-
             </ToolBar>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
@@ -38,15 +36,13 @@
             <Grid Grid.Column="0">
                 <ScrollViewer x:Name="scrollv" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <Button x:Name="btnOpenTemplateFile" Content="더존 엑셀 파일 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="btnOpenFile" Content="엑셀 파일 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="btnStartExcelWork" Content="엑셀 작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="ClearListBox" Content="작업 대기 큐 비우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
-
-                        <Button x:Name="btnLoadXml" Content="(사용금지)Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="btnStartWorkflow" Content="(사용금지)Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"/>
-
-
+                        <Button x:Name="btnOpenTemplateFile" Content="업로드 자료 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnOpenFile" Content="급여 자료 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnStartExcelWork" Content="작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="ClearListBox" Content="작업 리스트 비우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
+                        <!-- <Button x:Name="btnLoadXml" Visibility="Hidden" Content="(사용금지)Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnStartWorkflow" Visibility="Hidden" Content="(사용금지)Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"/>
+                        -->
                         <TextBlock x:Name="AnnouncementTextBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Azure"/>
                         <TextBlock x:Name="DebugConsoleBlock" TextWrapping="Wrap" Margin="10,10,10,10" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="Beige"/>
                     </StackPanel>
@@ -60,9 +56,9 @@
                                 <Setter Property="Margin" Value="0,10,0,0"></Setter>
                             </Style>
                         </StackPanel.Resources>
-                        <Label x:Name="ExcelTemplateViewLabel" Content="엑셀 탬플릿 (급여수당일괄업로드 )"></Label>
+                        <Label x:Name="ExcelTemplateViewLabel" Content="TheZone 업로드 자료 (급여수당일괄업로드)"></Label>
                         <ListView x:Name="ExcelTemplateView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                        <Label x:Name="ExcelListViewLabel" Content="엑셀 작업 대기 리스트"></Label>
+                        <Label x:Name="ExcelListViewLabel" Content="급여자료 작업 대기 리스트"></Label>
                         <ListView x:Name="ExcelListView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -73,13 +69,14 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Label x:Name="ExcelWorkEndLabel" Content="엑셀 작업 완료 리스트"></Label>
+                        <Label x:Name="ExcelWorkEndLabel" Content="작업 완료 리스트"></Label>
                         <ListView x:Name="ExcelWorkEndView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
-                        <Label x:Name="ExcelWorkFailLabel" Content="엑셀 작업 실패 리스트"></Label>
+                        <Label x:Name="ExcelWorkFailLabel" Content="작업 실패 리스트"></Label>
                         <ListView x:Name="ExcelWorkFailView" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
 
-                        <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"></Label>
+                        <!-- <Label x:Name="WorkflowXmlListViewLabel" Content="Xml Info"/>
                         <ListView x:Name="WorkflowXmlListView" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Visible"></ListView>
+                        -->
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

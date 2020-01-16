@@ -94,8 +94,8 @@ namespace tempproj
                 contextController.ClearExcelPath();
 
                 ExcelListView.SelectAll();
-                WorkflowXmlListView.SelectAll();
-                contextController.SetWorkflowXmlPath((string)WorkflowXmlListView.SelectedItem);
+                //WorkflowXmlListView.SelectAll();
+                //contextController.SetWorkflowXmlPath((string)WorkflowXmlListView.SelectedItem);
 
                 foreach (string excel in ExcelWorkEndView.SelectedItems)
                 {
@@ -126,7 +126,7 @@ namespace tempproj
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 MessageBox.Show("xmlFile이 로드되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -160,10 +160,10 @@ namespace tempproj
             if (openFileDialog.ShowDialog() == false)
                 return;
 
-            foreach (string filename in openFileDialog.FileNames)
+            /*foreach (string filename in openFileDialog.FileNames)
             {
                 WorkflowXmlListView.Items.Add(filename);
-            }
+            }*/
         }
 
         private void BtnStartExcelWork_Click(object sender, RoutedEventArgs e)
