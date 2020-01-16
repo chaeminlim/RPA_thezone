@@ -35,7 +35,7 @@ namespace tempproj
         private ContextController contextController;
         private ExcelActivity excelActivity;
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
-        private string path = @"..\..\..\MappingInfo.json";
+        private string path = @"MappingInfo.json";
         private double scr = double.MaxValue;
 
         public MainWindow()
@@ -68,11 +68,11 @@ namespace tempproj
         private void InitAnnoucement()
         {
             AnnouncementTextBlock.Text = @"<프로그램 사용법>
-1. 더존 엑셀 파일 불러오기 버튼을 눌러 급여수당일괄업로드 엑셀 파일을 지정하세요.
-2. 엑셀 파일 불러오기 버튼을 눌러 작업할 엑셀 파일을 불러오세요.
-3. 콤보 박스를 이용해 회사 이름을 지정하세요.
-4. 엑셀 작업 시작하기를 눌러 작업을 진행하세요. 좌측 하단에 작업이 완료되었음을 알리는 문구가 나타나기 전까지 프로그램을 종료하지 마세요.
-5. 작업 대상의 엑셀 파일들은 프로그램 시작 전 닫아주세요.
+1. 업로드 자료 불러오기 버튼을 눌러 급여수당일괄업로드 엑셀 파일을 지정하세요.
+2. 급여 자료 불러오기 버튼을 눌러 작업할 엑셀 파일을 불러오세요.
+3. 콤보 박스를 이용해 자료에 맞는 각 회사 이름을 지정하세요.
+4. 작업 시작하기를 눌러 작업을 진행하세요. 작업이 완료되었음을 알리는 메세지창이 나타나기 전까지 프로그램을 종료하지 마세요.
+5. 작업 대상의 급여자료 파일들은 프로그램 시작 전 닫아주세요.
 ";
         }
 

@@ -54,17 +54,16 @@ namespace tempproj
             }
             catch (COMException)
             {
-                ex = "Error : 관리자에게 문의하십시오";
+                ex = "Error : Excel 프로세스가 열려있는지 확인해주세요";
                 Close();
                 return ex;
             }
             catch (Exception)
             {
-                ex = "Error : 관리자에게 문의하십시오";
+                ex = "Error : 관리자에게 문의해주세요";
                 Close();
                 return ex;
             }
-
         }
 
         private void Open(string path, string sheetName = null)
@@ -113,10 +112,7 @@ namespace tempproj
         private void Read_Column(string center)
         {
             Excel.Range usedrng = eWS[center].UsedRange;
-            int rcnt = usedrng.Rows.Count;
-            int ccnt = usedrng.Columns.Count;
-            int IDcnt = 0; //인원수
-            Excel.Range temp, ID;
+            Excel.Range temp;
 
 
 
@@ -128,7 +124,7 @@ namespace tempproj
 
                     string col = GetExcelColumnName(addr.Column);
                     int rstart = addr.Row + offset;
-                    int rend = rstart + rcnt - 1;
+                    int rend = totalrow - 1;
                     temp = eWS[center].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
                     if (colvalues.ContainsKey(item.Key))
                     {
@@ -162,7 +158,9 @@ namespace tempproj
 
         private int Find_Entry(string center, string addr)
         {
+            
             Excel.Range mrng = eWS[center].Range[addr];
+            //Console.WriteLine(mrng.Value);
             bool rg = mrng.MergeCells;
             int rows = 1, row, col;
             if (rg)
@@ -218,7 +216,8 @@ namespace tempproj
             foreach (string name in names)
             {
                 List<Excel.Range> addrs = new List<Excel.Range>();
-                Excel.Range rng = usedrng.Find(name);
+                Excel.Range rng = usedrng.Find(name, Type.Missing, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
+                    Type.Missing, Excel.XlSearchDirection.xlNext, true, Type.Missing, Type.Missing);
 
                 if (rng != null)
                 {
@@ -226,21 +225,23 @@ namespace tempproj
                     addrs.Add(rng);
                     currentFind = usedrng.Find(name, rng, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
                         Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, true, Type.Missing, Type.Missing);
-                    if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column)
+                    //if (currentFind != null)
+                        //Console.WriteLine(name + " " + currentFind.Address + " " + totalrow);
+                    if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column && currentFind.Row < totalrow)
                     {
                         addrs.Add(currentFind);
                     }
                     colAddr.Add(name, addrs);
                 }
             }
-            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
+            /*foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
             {
                 Console.WriteLine(item.Key);
                 foreach (Excel.Range r in item.Value)
                 {
                     Console.WriteLine(r.Address);
                 }
-            }
+            }*/
         }
 
         private void Paste(string center, string thezone)
@@ -254,7 +255,7 @@ namespace tempproj
                 foreach (var values in item.Value) //item.Value.GetType => List<object[,]>
                 {
                     int row = 4;
-                    Console.WriteLine("Copy and Paste " + item.Key);
+                    //Console.WriteLine("Copy and Paste " + item.Key);
                     foreach (var val in values)
                     {
                         if (!mapped_table[item.Key].ToString().Equals("사원코드"))//사번을 제외한 나머지 항목 붙여넣기
@@ -299,8 +300,8 @@ namespace tempproj
                         }
                         row++;
                     }
-                    if (totalrow < row) //UsedRange의 Rows.Count가 정확하지 않아서 totalrow 변수를 이용해 row개수 구함
-                        totalrow = row;
+                    //if (totalrow < row) //UsedRange의 Rows.Count가 정확하지 않아서 totalrow 변수를 이용해 row개수 구함
+                     //   totalrow = row;
 
                 }
             }
@@ -321,7 +322,7 @@ namespace tempproj
             {
                 if (pos != null)
                 {
-                    Console.WriteLine(dest + " " + pos);
+                    //Console.WriteLine(dest + " " + pos);
                     JArray positions = (JArray)json["값"];
 
                     foreach (var item in positions)
@@ -329,7 +330,7 @@ namespace tempproj
                         if (pos.Equals(item.ToString()))
                         {
                             key = json["True"].ToString();
-                            Console.WriteLine(key);
+                            //Console.WriteLine(key);
                             break;
                         }
                     }
@@ -343,7 +344,7 @@ namespace tempproj
             {
                 if (pos != null)
                 {
-                    Console.WriteLine(dest + " " + pos);
+                    //Console.WriteLine(dest + " " + pos);
                     JArray positions = (JArray)json["값"];
 
                     foreach (var item in positions)
@@ -351,7 +352,7 @@ namespace tempproj
                         if (pos.Equals(item.ToString()))
                         {
                             key = json["True"].ToString();
-                            Console.WriteLine(key);
+                            //Console.WriteLine(key);
                             break;
                         }
                     }
@@ -368,7 +369,7 @@ namespace tempproj
 
             int rcnt = usedrng.Rows.Count;
             int ccnt = usedrng.Columns.Count;
-            Console.WriteLine(rcnt + " " + ccnt);
+            //Console.WriteLine(rcnt + " " + ccnt);
             Stack<Excel.Range> deleted = new Stack<Excel.Range>();
             //int rcnt = usedrng.Rows.Count;
             foreach (Excel.Range item in usedrng)

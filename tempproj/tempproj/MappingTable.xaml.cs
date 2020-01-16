@@ -32,7 +32,7 @@ namespace tempproj
         public ComboBoxItem SelectedcbItem { get; set; }
         public ComboBoxItem SelectedtzItem { get; set; }
 
-        private string path = @"..\..\..\MappingInfo.json";
+        private string path = @"MappingInfo.json";
         public MappingTable()
         {
             InitializeComponent();
@@ -131,7 +131,15 @@ namespace tempproj
         private void btn_AddRow_Click(object sender, RoutedEventArgs e)
         {
             String JKey = FromTextBox.Text;
-            String JValue = (String)SelectedtzItem.Content;
+            String JValue;
+            try
+            {
+                JValue = (String)SelectedtzItem.Content;
+            }
+            catch (System.NullReferenceException)
+            {
+                JValue = "";
+            }
             String JType = TypeTextBox.Text;
             String JTypeName = TypeNameTextBox.Text;
             String JTrue = TrueTextBox.Text;
