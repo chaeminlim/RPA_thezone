@@ -206,6 +206,12 @@ namespace tempproj
         {
             Excel.Range currentFind = null;
             Excel.Range usedrng = eWS[center].UsedRange;
+            Excel.Range end = eWS[center].UsedRange.Find("일용직");
+            if (end != null)
+            {
+                totalrow = end.Row;
+            }
+            else totalrow = usedrng.Rows.Count;
             int colcnt = usedrng.Columns.Count;
             List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
 
