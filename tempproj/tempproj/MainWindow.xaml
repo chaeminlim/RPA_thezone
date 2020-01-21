@@ -63,6 +63,7 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <WrapPanel>
+                                        <Button x:Name="btnByListElem" Click="btnByListElem_Click">x</Button>
                                         <ComboBox Loaded="ComboBox_Loaded" Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
                                         <TextBlock Text="{Binding PathInfo}"></TextBlock>
                                     </WrapPanel>

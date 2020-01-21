@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using GalaSoft.MvvmLight.Command;
 
 namespace tempproj
 {
@@ -35,7 +36,7 @@ namespace tempproj
         private ContextController contextController;
         private ExcelActivity excelActivity;
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
-        private string path = @"MappingInfo.json";
+        private string path = @"../../../MappingInfo.json";
         private double scr = double.MaxValue;
 
         public MainWindow()
@@ -46,25 +47,13 @@ namespace tempproj
             InitExcelContext();
         }
 
-        public void UpdateWindow()
-        {
-            // 화면 객체의 변경사항을 즉시 업데이트한다
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(
-                      System.Windows.Threading.DispatcherPriority.Background,
-                      new System.Threading.ThreadStart(delegate { }));
-        }
-        public void WriteDebugLine(string text)
-        {
-            DebugConsoleBlock.Text += text + Environment.NewLine;
-            scrollv.ScrollToVerticalOffset(scr);
-            UpdateWindow();
-        }
+#region 윈도우 이니셜라이저 메서드
+
         private void InitContext()
         {
             excelActivity = new ExcelActivity();
             contextController = new ContextController();
         }
-
         private void InitAnnoucement()
         {
             AnnouncementTextBlock.Text = @"<프로그램 사용법>
@@ -75,97 +64,27 @@ namespace tempproj
 5. 작업 대상의 급여자료 파일들은 프로그램 시작 전 닫아주세요.
 ";
         }
+        private void InitExcelContext()
+        {
+            ExcelWorkQueue = new List<ExcelWorkQueueDataStruct>();
+        }
+#endregion
 
-
-
-          
+#region 좌측버튼 이벤트
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ClearListBox_Click(object sender, RoutedEventArgs e)
         {
             ClearAllCurrentQueueData();
         }
-
-        private void btnStartWorkflow_Click(object sender, RoutedEventArgs e)
-        {
-            if (MessageBox.Show("Excel 파일을 올바르게 지정하였습니까?\n 프로그램이 시작되면 아무 작업도 수행하지 마세요.", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-            {
-            }
-            else
-            {
-                contextController.ClearExcelPath();
-
-                ExcelListView.SelectAll();
-                //WorkflowXmlListView.SelectAll();
-                //contextController.SetWorkflowXmlPath((string)WorkflowXmlListView.SelectedItem);
-
-                foreach (string excel in ExcelWorkEndView.SelectedItems)
-                {
-                    contextController.AddExcelPath(excel);
-                }
-
-                StartWorkflow();
-            }
-        }
-
-        private void StartWorkflow()
-        {
-            WorkflowController wf = new WorkflowController();
-
-            try
-            {
-                String[] xmllines = System.IO.File.ReadAllLines(contextController.GetWorkflowXmlPath());
-                foreach (String line in xmllines)
-                {
-                    int ErrCode = wf.DoActionXml(line);
-                    if (ErrCode == 0 || ErrCode >= 2)
-                    {
-                        WriteDebugLine("Error Code" + ErrCode);
-                        MessageBox.Show("Error Code " + ErrCode + ".\n 프로그램을 중단합니다.");
-                        
-                        return;
-                    }
-                }
-
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("xmlFile이 로드되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-        }
-
-
-        private void Recorder_Click(object sender, RoutedEventArgs e)
-        {
-            pwdBox pwdBox = new pwdBox();
-            pwdBox.ShowDialog();
-            
-            if (pwdBox.valid == 1)
-            {
-                Recorder recorder = new Recorder(contextController);
-                recorder.ShowDialog();
-            }
-            else
-            {
-                return;
-            }
-            
-        }
-
-        private void btnLoadXml_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = true;
-
-
-            if (openFileDialog.ShowDialog() == false)
-                return;
-
-            /*foreach (string filename in openFileDialog.FileNames)
-            {
-                WorkflowXmlListView.Items.Add(filename);
-            }*/
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnStartExcelWork_Click(object sender, RoutedEventArgs e)
         {
             // do stm
@@ -245,35 +164,22 @@ namespace tempproj
                 string temps = "";
                 if (workFailList.Count == 0)
                     temps = "없음";
-                foreach(string s in workFailList)
+                foreach (string s in workFailList)
                 {
                     temps += s;
                     temps += '\n';
                 }
                 MessageBox.Show("작업이 끝났습니다.\n" +
                     "작업 실패 리스트 : " +
-                    temps , "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    temps, "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                 WriteDebugLine("================================\n");
             }
         }
-
-        private void ClearAllCurrentQueueData()
-        {
-            ExcelWorkEndView.Items.Clear();
-            ExcelWorkQueue.Clear();
-            ExcelTemplateView.Items.Clear();
-            ExcelListView.Items.Clear();
-        }
-        private void ClearAllCurrentQueueData(int i)
-        {
-            if(i == 0)
-            {
-                ExcelWorkQueue.Clear();
-                ExcelTemplateView.Items.Clear();
-                ExcelListView.Items.Clear();
-            }
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnOpenTemplateFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -290,21 +196,11 @@ namespace tempproj
                 ExcelTemplateView.Items.Add(filename);
             }
         }
-
-        private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
-        {
-            MappingTable mappingTable = new MappingTable();
-            try
-            {
-                mappingTable.ShowDialog();
-            }
-            catch (System.InvalidOperationException)
-            {
-                MessageBox.Show("더블클릭은 안됩니다");
-                mappingTable.Close();
-            } //더블클릭 Exception 방지
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -318,7 +214,7 @@ namespace tempproj
 
 
             List<string> clientNames = new List<string>();
-            
+
             try
             {
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
@@ -349,13 +245,33 @@ namespace tempproj
                     continue;
                 }
                 ExcelWorkQueueDataStruct dataStructObj = new ExcelWorkQueueDataStruct(filename, clientNames);
-                
+
                 ExcelListView.Items.Add(dataStructObj);
                 ExcelWorkQueue.Add(dataStructObj);
 
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
+        {
+            MappingTable mappingTable = new MappingTable();
+            try
+            {
+                mappingTable.ShowDialog();
+            }
+            catch (System.InvalidOperationException)
+            {
+                MessageBox.Show("더블클릭은 안됩니다");
+                mappingTable.Close();
+            } //더블클릭 Exception 방지
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         class ExcelWorkQueueDataStruct
         {
             public string PathInfo { get; set; }
@@ -373,14 +289,145 @@ namespace tempproj
                 }
             }
 
-            
+
         }
 
+        #endregion
+
+#region selector sources
+        private void StartWorkflow()
+        {
+            WorkflowController wf = new WorkflowController();
+
+            try
+            {
+                String[] xmllines = System.IO.File.ReadAllLines(contextController.GetWorkflowXmlPath());
+                foreach (String line in xmllines)
+                {
+                    int ErrCode = wf.DoActionXml(line);
+                    if (ErrCode == 0 || ErrCode >= 2)
+                    {
+                        WriteDebugLine("Error Code" + ErrCode);
+                        MessageBox.Show("Error Code " + ErrCode + ".\n 프로그램을 중단합니다.");
+
+                        return;
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("xmlFile이 로드되지 않았습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+        }
+
+
+        private void Recorder_Click(object sender, RoutedEventArgs e)
+        {
+            pwdBox pwdBox = new pwdBox();
+            pwdBox.ShowDialog();
+
+            if (pwdBox.valid == 1)
+            {
+                Recorder recorder = new Recorder(contextController);
+                recorder.ShowDialog();
+            }
+            else
+            {
+                return;
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnStartWorkflow_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Excel 파일을 올바르게 지정하였습니까?\n 프로그램이 시작되면 아무 작업도 수행하지 마세요.", "Question", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+            {
+            }
+            else
+            {
+                contextController.ClearExcelPath();
+
+                ExcelListView.SelectAll();
+                //WorkflowXmlListView.SelectAll();
+                //contextController.SetWorkflowXmlPath((string)WorkflowXmlListView.SelectedItem);
+
+                foreach (string excel in ExcelWorkEndView.SelectedItems)
+                {
+                    contextController.AddExcelPath(excel);
+                }
+
+                StartWorkflow();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnLoadXml_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = true;
+
+
+            if (openFileDialog.ShowDialog() == false)
+                return;
+
+            /*foreach (string filename in openFileDialog.FileNames)
+            {
+                WorkflowXmlListView.Items.Add(filename);
+            }*/
+        }
+        #endregion
+
+#region 기타 기능
+        public void WriteDebugLine(string text)
+        {
+            DebugConsoleBlock.Text += text + Environment.NewLine;
+            scrollv.ScrollToVerticalOffset(scr);
+            UpdateWindow();
+        }
+
+
+        private void ClearAllCurrentQueueData()
+        {
+            ExcelWorkEndView.Items.Clear();
+            ExcelWorkQueue.Clear();
+            ExcelTemplateView.Items.Clear();
+            ExcelListView.Items.Clear();
+        }
+
+        private void ClearAllCurrentQueueData(int i)
+        {
+            if (i == 0)
+            {
+                ExcelWorkQueue.Clear();
+                ExcelTemplateView.Items.Clear();
+                ExcelListView.Items.Clear();
+            }
+        }
+        public void UpdateWindow()
+        {
+            // 화면 객체의 변경사항을 즉시 업데이트한다
+            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(
+                      System.Windows.Threading.DispatcherPriority.Background,
+                      new System.Threading.ThreadStart(delegate { }));
+        }
+        #endregion
+
+#region 리스트박스 이벤트 핸들러
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
 
-            foreach(ExcelWorkQueueDataStruct d in ExcelWorkQueue)
+            foreach (ExcelWorkQueueDataStruct d in ExcelWorkQueue)
             {
                 if (d.PathInfo == (string)((ComboBox)sender).Tag)
                 {
@@ -389,27 +436,6 @@ namespace tempproj
                 }
             }
         }
-
-        private JObject GetJObj(string key)
-        {
-            
-            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
-            using (JsonTextReader reader = new JsonTextReader(file))
-            {
-                JObject object1 = (JObject)JToken.ReadFrom(reader);
-
-                JObject elem = JObject.Parse(object1.SelectToken(key).ToString());
-                
-                reader.Close();
-                return elem;
-            }
-        }
-
-        private void InitExcelContext()
-        {
-            ExcelWorkQueue = new List<ExcelWorkQueueDataStruct>();
-        }
-
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             foreach (ExcelWorkQueueDataStruct d in ExcelWorkQueue)
@@ -420,17 +446,17 @@ namespace tempproj
                     filename = filename.Replace(" ", "");
                     Console.WriteLine(filename);
 
-                    foreach(ComboBoxItem cbi in d.cbItems)
+                    foreach (ComboBoxItem cbi in d.cbItems)
                     {
                         string comp = (string)cbi.Content;
-                        int l, c=0;
+                        int l, c = 0;
                         if (filename.Length > comp.Length) l = comp.Length;
                         else l = filename.Length;
 
                         for (int i = 0; i < l; i++)
                             if (filename[i] == comp[i]) c++;
-                        
-                        if(c >= l/2)
+
+                        if (c >= l / 2)
                         {
                             ((ComboBox)sender).SelectedItem = cbi;
                             break;
@@ -439,5 +465,33 @@ namespace tempproj
                 }
             }
         }
+        private void btnByListElem_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(((Button)sender).Name);
+            Console.WriteLine(((Button)sender).Parent.GetType()); 
+        }
+
+        #endregion
+
+        #region json 관련
+        private JObject GetJObj(string key)
+        {
+
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject object1 = (JObject)JToken.ReadFrom(reader);
+
+                JObject elem = JObject.Parse(object1.SelectToken(key).ToString());
+
+                reader.Close();
+                return elem;
+            }
+        }
+
+        #endregion
+
+
+
     }
 }
