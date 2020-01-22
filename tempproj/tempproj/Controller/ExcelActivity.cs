@@ -16,11 +16,14 @@ namespace tempproj
 
         public Dictionary<string, Excel.Application> eXL = new Dictionary<string, Excel.Application>();
         public Dictionary<string, Excel.Workbook> eWB = new Dictionary<string, Excel.Workbook>();
-        public Dictionary<string, Excel.Worksheet> eWS = new Dictionary<string, Excel.Worksheet>();
-        public Dictionary<string, List<object[,]>> colvalues = new Dictionary<string, List<object[,]>>();
-        public Dictionary<string, List<Excel.Range>> colAddr = new Dictionary<string, List<Excel.Range>>();
+        public Dictionary<string, Excel.Sheets> eWS = new Dictionary<string, Excel.Sheets>();
+        public Excel.Worksheet centerWS = null;
+        public Excel.Worksheet thezoneWS = null;
+        //public Dictionary<string,object[,]> colvalbyAddr = new Dictionary<string, object[,]>();
+        public Dictionary<string, object[,]> colvalbyName = new Dictionary<string, object[,]>();
+        List<String> addrs = new List<String>();
         public JObject mapped_table = new JObject();
-        public int totalrow = 0;
+        public int minbound = 4, maxbound = 0, totalrow = 0;
 
 
         public String Work(string center, string thezone, string savepath, JObject json)
@@ -29,15 +32,24 @@ namespace tempproj
             try
             {
                 mapped_table = json;
-                Open(center); Open(thezone);
-                Check_mapping_table(center, thezone);
-                Find_Columns(center);
-                Read_Column(center);
-                Paste(center, thezone);
-                Brush(thezone);
+                Open(center);
+                Open(thezone);
+                thezoneWS = eWS[thezone].Item[1];
+                foreach (Excel.Worksheet ws in eWS[center])
+                {
+                    addrs = mapped_table.Properties().Select(p => p.Name).ToList();
+                    centerWS = ws;
+                    Read_Column();
+                    Paste();
+                    Brush();
+
+
+                    minbound = maxbound;
+                    colvalbyName.Clear();
+                    //colvalbyAddr.Clear();
+                }
                 Checksum(thezone);
-                Save(thezone, savepath);
-                Close();
+                Save(savepath);
                 return ex;
             }
             catch (NullReferenceException e)
@@ -66,15 +78,12 @@ namespace tempproj
             }
         }
 
-        private void Open(string path, string sheetName = null)
+        private void Open(string path)
         {
             eXL.Add(path, new Excel.Application());
             eWB.Add(path, eXL[path].Workbooks.Open(path));
             //eXL[path].Visible = true;
-            if (sheetName == null)  //default : 현재 workbook의 첫번째 worksheet를 open
-                eWS.Add(path, eWB[path].Worksheets.get_Item(1) as Excel.Worksheet);
-            else                    //workbook 내에 여러 시트중 원하는 시트가 있으면 해당 시트 open
-                eWS.Add(path, eWB[path].Worksheets.Item[sheetName]);
+            eWS.Add(path, eWB[path].Worksheets);
         }
 
         private void Check_mapping_table(string center, string thezone) //mapping table
@@ -83,7 +92,7 @@ namespace tempproj
             Excel.Range check = null;
             foreach (string colname in names)
             {
-                check = eWS[center].UsedRange.Find(colname);
+                check = centerWS.UsedRange.Find(colname);
                 if (check == null)
                     throw new NullReferenceException($"{center}의 mapping table에서 center쪽 {colname} (이/가) 없음");
             }
@@ -98,45 +107,62 @@ namespace tempproj
                     temp2 = t["False"].ToString();
                     if (temp2 != null)
                     {
-                        check = eWS[thezone].UsedRange.Find(temp2);
+                        check = centerWS.UsedRange.Find(temp2);
                         if (check == null)
                             throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname} (이/가) 없음");
                     }
                 }
-                check = eWS[thezone].UsedRange.Find(temp);
+                check = centerWS.UsedRange.Find(temp);
                 if (check == null)
                     throw new NullReferenceException($"{center}의 mapping table에서 thezone쪽 {colname} (이/가) 없음");
             }
         }
 
-        private void Read_Column(string center)
+        private void Read_Column()
         {
-            Excel.Range usedrng = eWS[center].UsedRange;
+            Excel.Range usedrng = centerWS.UsedRange;
             Excel.Range temp;
 
-
-
-            foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
+            Excel.Range boundary = centerWS.UsedRange.Find("일용직");
+            if (boundary != null)
             {
-                foreach (Excel.Range addr in item.Value)
-                {
-                    int offset = Find_Entry(center, addr.Address); //cell이 병합됬을 경우 시작점 계산
+                maxbound += boundary.Row - 1;
+                totalrow = boundary.Row - 1;
+            }
+            else
+            {
+                maxbound += usedrng.Rows.Count;
+                totalrow = usedrng.Rows.Count;
+            }
 
-                    string col = GetExcelColumnName(addr.Column);
-                    int rstart = addr.Row + offset;
-                    int rend = totalrow - 1;
-                    temp = eWS[center].Range[col + rstart.ToString() + ":" + col + rend.ToString()];
-                    if (colvalues.ContainsKey(item.Key))
+
+            foreach (String addr in addrs)
+            {
+                String name = centerWS.Range[addr].Value;
+                Console.WriteLine(name);
+                int row = centerWS.Range[addr].Row;
+                int col = centerWS.Range[addr].Column;
+                int offset = Find_Entry(addr);
+                String colname = GetExcelColumnName(col);
+                String start = colname + (row + offset).ToString();
+                String end = colname + totalrow.ToString();
+                Console.WriteLine(start + " " + end);
+                temp = centerWS.Range[start + ":" + end];
+                //Console.WriteLine(v.GetLength(0) + " " + v.GetLength(1)); 
+                object[,] v = temp.Value;
+                if (!colvalbyName.ContainsKey(name))
+                {
+                    colvalbyName.Add(name, v);
+                    //colvalbyAddr.Add(addr, v);
+                }
+                else //합산하는 경우
+                {
+                    for (int i = 1; i <= temp.Value.GetLength(0); i++)
                     {
-                        colvalues[item.Key].Add(temp.Value);
-                    }
-                    else
-                    {
-                        List<object[,]> rtemp = new List<object[,]>();
-                        rtemp.Add(temp.Value);
-                        colvalues.Add(item.Key, rtemp);
+                        colvalbyName[name][i, 1] = (double)colvalbyName[name][i, 1] + (double)v[i, 1];
                     }
                 }
+
             }
         }
 
@@ -156,11 +182,9 @@ namespace tempproj
             return columnName;
         }
 
-        private int Find_Entry(string center, string addr)
+        private int Find_Entry(string addr)
         {
-            
-            Excel.Range mrng = eWS[center].Range[addr];
-            //Console.WriteLine(mrng.Value);
+            Excel.Range mrng = centerWS.Range[addr];
             bool rg = mrng.MergeCells;
             int rows = 1, row, col;
             if (rg)
@@ -176,11 +200,11 @@ namespace tempproj
             }
             else
             {
-                if (mapped_table[mrng.Value].ToString().Equals("사원코드"))
+                if (mapped_table[addr].ToString().Equals("사원코드"))
                 {
                     row = mrng.Row + 1;
                     col = mrng.Column;
-                    while (eWS[center].Cells[row, col].Value == null)
+                    while (centerWS.Cells[row, col].Value == null)
                     {
                         row++;
                     }
@@ -189,7 +213,7 @@ namespace tempproj
                 {
                     row = mrng.Row + 1;
                     col = mrng.Column;
-                    while (!(eWS[center].Cells[row, col].Value is double))
+                    while (!(centerWS.Cells[row, col].Value is double))
                     {
                         row++;
                     }
@@ -197,83 +221,40 @@ namespace tempproj
                 rows = row - mrng.Row;
             }
             return rows;
-            //eWS[exl].Range[addr].Value = "hi";
         }
 
-        private void Find_Columns(string center)
+
+        private void Paste()
         {
-            Excel.Range currentFind = null;
-            Excel.Range usedrng = eWS[center].UsedRange;
-            Excel.Range end = eWS[center].UsedRange.Find("일용직");
-            if (end != null)
+            Excel.Range colrng = thezoneWS.Range["A1", thezoneWS.Range["A1"].End[Excel.XlDirection.xlToRight]];
+            foreach (var item in addrs)
             {
-                totalrow = end.Row;
-            }
-            else totalrow = usedrng.Rows.Count;
-            int colcnt = usedrng.Columns.Count;
-            List<string> names = mapped_table.Properties().Select(p => p.Name).ToList(); //mapping table에 있는 Key값들을 List로 가져오기
-
-            foreach (string name in names)
-            {
-                List<Excel.Range> addrs = new List<Excel.Range>();
-                Excel.Range rng = usedrng.Find(name, Type.Missing, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
-                    Type.Missing, Excel.XlSearchDirection.xlNext, true, Type.Missing, Type.Missing);
-
-                if (rng != null)
+                Excel.Range findrng = colrng.Find(mapped_table[item].ToString());
+                String itemkey = centerWS.Range[item].Value.ToString();
+                if (findrng == null)
                 {
-                    //colAddr.Add(name, rng);
-                    addrs.Add(rng);
-                    currentFind = usedrng.Find(name, rng, Excel.XlFindLookIn.xlValues, Excel.XlLookAt.xlPart,
-                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlNext, true, Type.Missing, Type.Missing);
-                    //if (currentFind != null)
-                        //Console.WriteLine(name + " " + currentFind.Address + " " + totalrow);
-                    if (currentFind != null && rng.Address != currentFind.Address && rng.Column != currentFind.Column && currentFind.Row < totalrow)
+                    throw new NullReferenceException($"thezone에 {mapped_table[item].ToString()}(이/가) 없음");
+                }
+                else
+                {
+                    if (!(mapped_table[item] is JObject)) //1:1 mapping
                     {
-                        addrs.Add(currentFind);
+                        String col = GetExcelColumnName(findrng.Column);
+                        thezoneWS.Range[col + minbound.ToString() + ":" + col + maxbound].Value = colvalbyName[itemkey];
                     }
-                    colAddr.Add(name, addrs);
-                }
-            }
-            /*foreach (KeyValuePair<string, List<Excel.Range>> item in colAddr)
-            {
-                Console.WriteLine(item.Key);
-                foreach (Excel.Range r in item.Value)
-                {
-                    Console.WriteLine(r.Address);
-                }
-            }*/
-        }
-
-        private void Paste(string center, string thezone)
-        {
-            Excel.Range colrng = eWS[thezone].Range["A1", eWS[thezone].Range["A1"].End[Excel.XlDirection.xlToRight]];
-            int colcnt = colrng.Count;
-            String key = String.Empty;
-            Excel.Range rng = null;
-            foreach (KeyValuePair<string, List<object[,]>> item in colvalues)
-            {
-                foreach (var values in item.Value) //item.Value.GetType => List<object[,]>
-                {
-                    int row = 4;
-                    //Console.WriteLine("Copy and Paste " + item.Key);
-                    foreach (var val in values)
+                    else
                     {
-                        if (!mapped_table[item.Key].ToString().Equals("사원코드"))//사번을 제외한 나머지 항목 붙여넣기
+                        int row = minbound;
+                        foreach (var val in colvalbyName[itemkey])
                         {
-                            if (!(mapped_table[item.Key] is JObject)) //1:1 mapping
+                            String key = Get_Colname(itemkey, row, (JObject)mapped_table[item]);//Rule 3 적용 함수
+                            if (key == null)
                             {
-                                rng = colrng.Find(mapped_table[item.Key].ToString());
+                                row++;
+                                continue;
                             }
-                            else //Rule 3 적용
-                            {
-                                key = Get_Colname(center, item.Key, row, (JObject)mapped_table[item.Key]);//Rule 3 적용 함수
-                                if (key == null)
-                                {
-                                    row++;
-                                    continue;
-                                }
-                                rng = colrng.Find(key);
-                            }
+                            Excel.Range rng = colrng.Find(key);
+
                             if (rng[row.ToString()].Value != null)
                             {
                                 if (val != null)
@@ -292,29 +273,22 @@ namespace tempproj
                                 else
                                     rng[row.ToString()].Value += 0;
                             }
-                        }
-                        else //사번 붙여넣기
-                        {
-                            rng = colrng.Find(mapped_table[item.Key].ToString());
-                            rng[row.ToString()].Value = val;
-                        }
-                        row++;
-                    }
-                    //if (totalrow < row) //UsedRange의 Rows.Count가 정확하지 않아서 totalrow 변수를 이용해 row개수 구함
-                     //   totalrow = row;
+                            row++;
 
+                        }
+                    }
                 }
             }
         }
 
-        private String Get_Colname(string center, string itemkey, int row, JObject json) //For Rule 3
+        private String Get_Colname(string itemkey, int row, JObject json) //For Rule 3
         {
             String position, pos, key = null;
             int offset, dest;
             position = json["구분"].ToString();
 
-            Excel.Range prng = eWS[center].UsedRange.Find(position);
-            offset = Find_Entry(center, prng.Address); //cell이 병합됬을 경우 시작점 계산
+            Excel.Range prng = centerWS.UsedRange.Find(position);
+            offset = Find_Entry(prng.Address); //cell이 병합됬을 경우 시작점 계산
             dest = prng.Row + offset + row - 4;
             pos = prng.Cells[dest].Value;
 
@@ -322,7 +296,7 @@ namespace tempproj
             {
                 if (pos != null)
                 {
-                    //Console.WriteLine(dest + " " + pos);
+                    Console.WriteLine(dest + " " + pos);
                     JArray positions = (JArray)json["값"];
 
                     foreach (var item in positions)
@@ -330,7 +304,7 @@ namespace tempproj
                         if (pos.Equals(item.ToString()))
                         {
                             key = json["True"].ToString();
-                            //Console.WriteLine(key);
+                            Console.WriteLine(key);
                             break;
                         }
                     }
@@ -352,7 +326,7 @@ namespace tempproj
                         if (pos.Equals(item.ToString()))
                         {
                             key = json["True"].ToString();
-                            //Console.WriteLine(key);
+                            Console.WriteLine(key);
                             break;
                         }
                     }
@@ -362,24 +336,23 @@ namespace tempproj
             return key;
         }
 
-        private void Brush(string thezone)
+        private void Brush()
         {
-            Excel.Range usedrng = eWS[thezone].UsedRange.Rows.Offset[3];
-            //Excel.Range truncaterng = eWS[thezone].UsedRange.Offset[3, 1];
+            Excel.Range usedrng = thezoneWS.UsedRange.Rows.Offset[3];
+
 
             int rcnt = usedrng.Rows.Count;
             int ccnt = usedrng.Columns.Count;
-            //Console.WriteLine(rcnt + " " + ccnt);
             Stack<Excel.Range> deleted = new Stack<Excel.Range>();
             //int rcnt = usedrng.Rows.Count;
             foreach (Excel.Range item in usedrng)
             {
-                string ssn = item.Cells[1, 1].Value;
+                var ssn = item.Cells[1, 1].Value;
 
                 if (ssn != null)
                 {
                     Regex regex = new Regex(@"^[A-Z]{3}");
-                    if (!regex.IsMatch(ssn))
+                    if (!regex.IsMatch(ssn.ToString()))
                     {
                         deleted.Push(item);
                     }
@@ -397,31 +370,47 @@ namespace tempproj
 
         }
 
-        private void Save(string thezone, string savepath)
+        private void Save(string savepath)
         {
             if (System.IO.File.Exists(savepath))
                 System.IO.File.Delete(savepath);
-            eWS[thezone].SaveAs(savepath);
+            thezoneWS.SaveAs(savepath);
         }
         private void Checksum(string thezone)
         {
-
-            Excel.Range usedrng = eWS[thezone].UsedRange;
+            Excel.Range usedrng = thezoneWS.UsedRange;
             Excel.Range sum = null;
-            sum = eWS[thezone].Range["CH4"];
-            Excel.Range employeesum = sum.Resize[totalrow - 4, Type.Missing];
-            employeesum.Formula = "=ROUND(SUM(B4:CF4), 0)";
+            Excel.Range valrng = thezoneWS.UsedRange.Offset[3, 1];
+            for (int i = usedrng.Columns.Count; i >= 1; i--)
+            {
+                double num = eXL[thezone].WorksheetFunction.CountA(valrng.Columns[i]);
+                if (num == 0)
+                {
+                    usedrng.Columns[i + 1].Delete();
+                    //deleted.Enqueue(usedrng.Columns[i+1]);
+                }
+            }
+            Console.WriteLine(usedrng.Rows.Count + " " + usedrng.Columns.Count + " " + maxbound);
+            int cnt = usedrng.Columns.Count;
 
-            sum = eWS[thezone].Range["B" + totalrow];
-            Excel.Range categorysum = sum.Resize[Type.Missing, 83];
-            categorysum.Formula = "=ROUND(SUM(B" + 4.ToString() + ":B" + (totalrow - 1).ToString() + "), 0)";
+            sum = thezoneWS.Range["B" + maxbound];
+            Excel.Range categorysum = sum.Resize[Type.Missing, cnt - 1];
+            categorysum.Formula = "=ROUND(SUM(B" + 4.ToString() + ":B" + (maxbound - 1).ToString() + "), 0)"; //항목 별 합계
 
-            Excel.Range totalsum = eWS[thezone].Range["CH" + totalrow.ToString()];
-            string formula = "=ROUND(SUM(CH4:CH" + (totalrow - 1).ToString() + ", B" + totalrow.ToString() + ":CF" + totalrow.ToString() + "), 2)";
+
+            String forsum = GetExcelColumnName(cnt + 1);
+            String forend = GetExcelColumnName(cnt);
+            sum = thezoneWS.Range[forsum + "4"];
+            Excel.Range employeesum = sum.Resize[maxbound - 4, Type.Missing];//offset 때문에 4를 빼줌
+            employeesum.Formula = "=ROUND(SUM(B4:" + forend + "4), 0)"; //직원 당 합계
+
+            Excel.Range totalsum = thezoneWS.Range[forsum + maxbound.ToString()];
+            string formula = "=ROUND(SUM(" + forsum + "4:" + forsum + (maxbound - 1).ToString() + ", B" + maxbound.ToString() + ":" + forend + maxbound.ToString() + "), 2)"; //최종 합계
             //Console.WriteLine(formula);
             totalsum.Formula = formula;
             totalsum.NumberFormat = 0;
 
+            valrng.NumberFormat = "0";
 
         }
         public void Close() //열려있는 모든 excel 객체 해제
@@ -443,7 +432,7 @@ namespace tempproj
                         excelProcess.Kill();
                     }
                 }
-                foreach (KeyValuePair<string, Excel.Worksheet> item in eWS)
+                foreach (KeyValuePair<string, Excel.Sheets> item in eWS)
                     ReleaseExcelObject(item.Value);
                 foreach (KeyValuePair<string, Excel.Workbook> item in eWB)
                     ReleaseExcelObject(item.Value);
@@ -452,8 +441,11 @@ namespace tempproj
                 eWS.Clear();
                 eWB.Clear();
                 eXL.Clear();
-                colAddr.Clear();
-                colvalues.Clear();
+                colvalbyName.Clear();
+                //colvalbyAddr.Clear();
+                centerWS = null;
+                thezoneWS = null;
+                minbound = 4; maxbound = 0;
             }
             catch (Exception) { }
         }

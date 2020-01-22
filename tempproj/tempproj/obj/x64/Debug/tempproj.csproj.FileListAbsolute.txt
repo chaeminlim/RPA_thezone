@@ -131,3 +131,14 @@ C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Deb
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.xml
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.pdb
 C:\Users\Chae Min Lim\Documents\GitHub\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.xml
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\CommonServiceLocator.dll
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.dll
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.dll
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.dll
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\System.Windows.Interactivity.dll
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.pdb
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.xml
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.pdb
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.xml
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.pdb
+C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.xml
