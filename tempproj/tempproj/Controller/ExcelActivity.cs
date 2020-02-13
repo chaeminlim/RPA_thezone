@@ -349,7 +349,8 @@ namespace tempproj
 
                 if (!colvalbyCenterName.ContainsKey(name))
                 {
-                    colvalbyCenterName.Add(name, v);
+                    object[,] thezonevalues = (object[,])v.Clone();
+                    colvalbyCenterName.Add(name, thezonevalues);
                     //colvalbyAddr.Add(addr, v);
                 }
                 /*else
@@ -376,8 +377,10 @@ namespace tempproj
                     {
                         if (!(thezonecol is JObject))
                         {
-                            colvalbyThezoneName.Add(thezonecol.ToString(), v);//thezone은 1:1mapping되는 column만 저장
-                                                                              //Console.WriteLine(mapping_table[addr].ToString() + " 노합산");
+                            object[,] thezonevalues = (object[,])v.Clone();
+                            
+                            colvalbyThezoneName.Add(thezonecol.ToString(), thezonevalues);//thezone은 1:1mapping되는 column만 저장
+                                                                                          //Console.WriteLine(mapping_table[addr].ToString() + " 노합산");
                         }
                     }
                     else //합산하는 경우
@@ -573,20 +576,20 @@ namespace tempproj
             //Console.WriteLine("=ROUND(SUM(B" + minbound.ToString() + ":" + forend + minbound.ToString() + "), 0)");
             sum = thezoneWS.Range[forsum + minbound.ToString()];
             Excel.Range employeesum = sum.Resize[totalrow - 5, Type.Missing];//offset 때문에 4를 빼줌 + 개수만큼 늘려서 1을 더 빼줌
-            employeesum.Formula = "=ROUND(SUM(B" + minbound.ToString() + ":" + "BH" + minbound.ToString() + "), 0)"; //직원 당 합계
+            employeesum.Formula = "=SUM(B" + minbound.ToString() + ":" + "BH" + minbound.ToString() + ")"; //직원 당 합계
 
 
             ////////category별 합계
             //Console.WriteLine("=ROUND(SUM(B" + minbound.ToString() + ":B" + (maxbound - 1).ToString() + "), 0)");
             sum = thezoneWS.Range["B" + maxbound];
             Excel.Range categorysum = sum.Resize[Type.Missing, colcnt];
-            categorysum.Formula = "=ROUND(SUM(B" + minbound.ToString() + ":B" + (maxbound - 1).ToString() + "), 0)"; //항목 별 합계
+            categorysum.Formula = "=SUM(B" + minbound.ToString() + ":B" + (maxbound - 1).ToString() + ")"; //항목 별 합계
             //SumFlag.Add(maxbound);
 
             ////////category별 합계와 직원별 합계의 합
             Excel.Range totalsum = thezoneWS.Range[fortotalsum + maxbound.ToString()];
             //string formula = "=ROUND(SUM(" + forsum + minbound.ToString() + ":" + forsum + (maxbound - 1).ToString() + ", B" + maxbound.ToString() + ":" + forend + maxbound.ToString() + "), 0)"; //최종 합계
-            string formula = "=ROUND(SUM(" + ", B" + maxbound.ToString() + ":" + forsum + maxbound.ToString() + "), 0)";
+            string formula = "=SUM(" + ", B" + maxbound.ToString() + ":" + forsum + maxbound.ToString() + ")";
             //Console.WriteLine(formula);
             totalsum.Formula = formula;
             //totalsum.NumberFormat = '0';
