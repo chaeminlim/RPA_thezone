@@ -109,7 +109,7 @@ namespace tempproj
 
                 foreach (ExcelWorkQueueDataStruct dataStruct in ExcelWorkQueue)
                 {
-                    if (dataStruct.jObject == null)
+                    if (dataStruct.jObjectList == null)
                     {
                         MessageBox.Show("회사가 선택되지 않았거나,\n중복된 파일을 선택했습니다.", "Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
@@ -138,7 +138,7 @@ namespace tempproj
                     WriteDebugLine("작업중입니다.. (" + c + "/" + ExcelWorkQueue.Count + ")");
 
                     string ErrorCode = "";
-                    ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObject);
+                    ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObjectList);
 
                     if (ErrorCode != null)
                     {
@@ -276,11 +276,11 @@ namespace tempproj
         {
             public string PathInfo { get; set; }
             public ObservableCollection<ComboBoxItem> cbItems { get; set; }
-            public JObject jObject { get; set; }
+            public List<JObject> jObjectList { get; set; }
             public ExcelWorkQueueDataStruct(string path, List<string> clientNames)
             {
                 PathInfo = path;
-                jObject = null;
+                jObjectList = null;
                 cbItems = new ObservableCollection<ComboBoxItem>();
 
                 foreach (string s in clientNames)
@@ -431,7 +431,7 @@ namespace tempproj
             {
                 if (d.PathInfo == (string)((ComboBox)sender).Tag)
                 {
-                    d.jObject = GetJObj((string)((ComboBoxItem)((ComboBox)sender).SelectedItem).Content);
+                    d.jObjectList = GetJObj((string)((ComboBoxItem)((ComboBox)sender).SelectedItem).Content);
                     break;
                 }
             }
@@ -474,18 +474,22 @@ namespace tempproj
         #endregion
 
         #region json 관련
-        private JObject GetJObj(string key)
+        private List<JObject> GetJObj(string key)
         {
+            Console.WriteLine("key"+key);
 
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
                 JObject object1 = (JObject)JToken.ReadFrom(reader);
+                Console.WriteLine(object1[key]);
 
-                JObject elem = JObject.Parse(object1.SelectToken(key).ToString());
+                List<JObject> elemList = object1[key].ToObject<List<JObject>>();
+
+                //List<JObject> elemList = JObject.Parse(object1.SelectToken(key).ToString()).ToObject<List<JObject>>();
 
                 reader.Close();
-                return elem;
+                return elemList;
             }
         }
 
