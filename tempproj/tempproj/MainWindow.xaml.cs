@@ -71,20 +71,12 @@ namespace tempproj
 #endregion
 
 #region 좌측버튼 이벤트
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void ClearListBox_Click(object sender, RoutedEventArgs e)
         {
             ClearAllCurrentQueueData();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void BtnStartExcelWork_Click(object sender, RoutedEventArgs e)
         {
             // do stm
@@ -134,9 +126,10 @@ namespace tempproj
 
                     savePath = temp.ToString();
                     Console.WriteLine(savePath);
-
+                    
                     WriteDebugLine("작업중입니다.. (" + c + "/" + ExcelWorkQueue.Count + ")");
-
+                    UpdateWindow();
+                    
                     string ErrorCode = "";
                     ErrorCode = excelActivity.Work(dataStruct.PathInfo, templatePath, savePath, dataStruct.jObjectList);
 
@@ -175,11 +168,7 @@ namespace tempproj
                 WriteDebugLine("================================\n");
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void BtnOpenTemplateFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -196,11 +185,7 @@ namespace tempproj
                 ExcelTemplateView.Items.Add(filename);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -246,16 +231,10 @@ namespace tempproj
                 }
                 ExcelWorkQueueDataStruct dataStructObj = new ExcelWorkQueueDataStruct(filename, clientNames);
 
-                ExcelListView.Items.Add(dataStructObj);
-                ExcelWorkQueue.Add(dataStructObj);
-
+                AddToWorkQueueAndList(ExcelListView, ExcelWorkQueue, dataStructObj);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+
         private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
         {
             MappingTable mappingTable = new MappingTable();
@@ -269,9 +248,31 @@ namespace tempproj
                 mappingTable.Close();
             } //더블클릭 Exception 방지
         }
-        /// <summary>
-        /// 
-        /// </summary>
+
+        private void AddToWorkQueueAndList(ListView ExcelListView, List<ExcelWorkQueueDataStruct> ExcelWorkQueue, ExcelWorkQueueDataStruct dataStructObj)
+        {
+            ExcelListView.Items.Add(dataStructObj);
+            ExcelWorkQueue.Add(dataStructObj);
+        }
+        private void ClearWorkQueueAndList(ListView ExcelListView, List<ExcelWorkQueueDataStruct> ExcelWorkQueue)
+        {
+            ExcelListView.Items.Clear();
+            ExcelWorkQueue.Clear();
+        }
+        private void RemoveAtWorkQueueAndList(ListView ExcelListView, List<ExcelWorkQueueDataStruct> ExcelWorkQueue, String pathInfo)
+        {
+            foreach(ExcelWorkQueueDataStruct ewqds in ExcelWorkQueue)
+            {
+                if (ewqds.PathInfo == pathInfo)
+                {
+                    ExcelWorkQueue.RemoveAt(ExcelWorkQueue.IndexOf(ewqds));
+                    ExcelListView.Items.Remove(ewqds);
+                    break; 
+                } 
+                
+            }
+        }
+
         class ExcelWorkQueueDataStruct
         {
             public string PathInfo { get; set; }
@@ -398,19 +399,19 @@ namespace tempproj
 
         private void ClearAllCurrentQueueData()
         {
+
             ExcelWorkEndView.Items.Clear();
-            ExcelWorkQueue.Clear();
             ExcelTemplateView.Items.Clear();
-            ExcelListView.Items.Clear();
+            ClearWorkQueueAndList(ExcelListView, ExcelWorkQueue);
+
         }
 
         private void ClearAllCurrentQueueData(int i)
         {
             if (i == 0)
             {
-                ExcelWorkQueue.Clear();
-                ExcelTemplateView.Items.Clear();
-                ExcelListView.Items.Clear();
+                ClearWorkQueueAndList(ExcelListView, ExcelWorkQueue);
+                ExcelTemplateView.Items.Clear();  
             }
         }
         public void UpdateWindow()
@@ -425,16 +426,21 @@ namespace tempproj
 #region 리스트박스 이벤트 핸들러
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-
             foreach (ExcelWorkQueueDataStruct d in ExcelWorkQueue)
             {
-                if (d.PathInfo == (string)((ComboBox)sender).Tag)
+                try
                 {
-                    d.jObjectList = GetJObj((string)((ComboBoxItem)((ComboBox)sender).SelectedItem).Content);
-                    break;
+                    if (d.PathInfo == (string)((ComboBox)sender).Tag)
+                    {
+                        d.jObjectList = GetJObj((string)((ComboBoxItem)((ComboBox)sender).SelectedItem).Content);
+                        break;
+                    }
                 }
-            }
+                catch (NullReferenceException)
+                {
+
+                }
+           }
         }
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)
         {
@@ -467,8 +473,8 @@ namespace tempproj
         }
         private void btnByListElem_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(((Button)sender).Name);
-            Console.WriteLine(((Button)sender).Parent.GetType()); 
+            String pathInfo = ((ExcelWorkQueueDataStruct)((TextBlock)((WrapPanel)((Button)sender).Parent).Children[2]).DataContext).PathInfo;
+            RemoveAtWorkQueueAndList(ExcelListView, ExcelWorkQueue, pathInfo);
         }
 
         #endregion
@@ -476,26 +482,24 @@ namespace tempproj
         #region json 관련
         private List<JObject> GetJObj(string key)
         {
-            Console.WriteLine("key"+key);
 
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
                 JObject object1 = (JObject)JToken.ReadFrom(reader);
-                Console.WriteLine(object1[key]);
 
                 List<JObject> elemList = object1[key].ToObject<List<JObject>>();
-
-                //List<JObject> elemList = JObject.Parse(object1.SelectToken(key).ToString()).ToObject<List<JObject>>();
 
                 reader.Close();
                 return elemList;
             }
         }
 
+
+
         #endregion
+        
 
-
-
+        
     }
 }

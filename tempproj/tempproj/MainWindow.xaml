@@ -36,10 +36,10 @@
             <Grid Grid.Column="0">
                 <ScrollViewer x:Name="scrollv" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <Button x:Name="btnOpenTemplateFile" Content="업로드 자료 불러오기" HorizontalAlignment="Center" Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="btnOpenFile" Content="급여 자료 불러오기" HorizontalAlignment="Center" Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="btnStartExcelWork" Content="작업 시작하기" HorizontalAlignment="Center" Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
-                        <Button x:Name="ClearListBox" Content="작업 리스트 비우기" HorizontalAlignment="Center" Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnOpenTemplateFile" Content="업로드 자료 불러오기"  Click="BtnOpenTemplateFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnOpenFile" Content="급여 자료 불러오기"  Click="btnOpenFile_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="btnStartExcelWork" Content="작업 시작하기"  Click="BtnStartExcelWork_Click" Margin="2,2,2,0" Width="200"/>
+                        <Button x:Name="ClearListBox" Content="작업 리스트 비우기"  Click="ClearListBox_Click"  Margin="2,2,2,0" Width="200"/>
                         <!-- <Button x:Name="btnLoadXml" Visibility="Hidden" Content="(사용금지)Load Xml File" HorizontalAlignment="Center" Click="btnLoadXml_Click" Margin="2,2,2,0" Width="200"/>
                         <Button x:Name="btnStartWorkflow" Visibility="Hidden" Content="(사용금지)Start Work" HorizontalAlignment="Center" Click="btnStartWorkflow_Click" Margin="2,2,2,0" Width="200"/>
                         -->
@@ -65,7 +65,8 @@
                                     <WrapPanel>
                                         <Button x:Name="btnByListElem" Click="btnByListElem_Click">x</Button>
                                         <ComboBox Loaded="ComboBox_Loaded" Tag="{Binding PathInfo}" ItemsSource="{Binding cbItems}" SelectionChanged="ComboBox_SelectionChanged" IsEditable="True" IsReadOnly="True"  Text="회사를 선택하세요."></ComboBox>
-                                        <TextBlock Text="{Binding PathInfo}"></TextBlock>
+                                        <TextBlock x:Name="WrapPanelTextBlock" Text="{Binding PathInfo}"></TextBlock>
+
                                     </WrapPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
