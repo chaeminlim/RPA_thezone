@@ -142,3 +142,19 @@ C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLig
 C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.xml
 C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.pdb
 C:\repo\Git_Project\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.xml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\CommonServiceLocator.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\Newtonsoft.Json.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\System.Windows.Interactivity.dll
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.pdb
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.xml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.pdb
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Extras.xml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.pdb
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\GalaSoft.MvvmLight.Platform.xml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\bin\x64\Debug\Newtonsoft.Json.xml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\obj\x64\Debug\MappingTable.g.cs
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\obj\x64\Debug\MappingTable.baml
+C:\Users\Chaemin Lim\Desktop\RPA_thezone\tempproj\tempproj\obj\x64\Debug\tempproj.csproj.CopyComplete

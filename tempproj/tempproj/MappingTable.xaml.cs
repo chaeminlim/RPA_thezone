@@ -28,11 +28,11 @@ namespace tempproj
     {
         public ObservableCollection<ComboBoxItem> cbItems { get; set; }
         public ObservableCollection<ComboBoxItem> TheZoneItems { get; set; }
-        private JObject CurrentJsonObj;
+        private List<JObject> CurrentJsonObjList;
         public ComboBoxItem SelectedcbItem { get; set; }
         public ComboBoxItem SelectedtzItem { get; set; }
 
-        private string path = @"MappingInfo.json";
+        private string path = @"../../../MappingInfo.json";
         public MappingTable()
         {
             InitializeComponent();
@@ -86,9 +86,10 @@ namespace tempproj
             {
                 JObject object1 = (JObject)JToken.ReadFrom(reader);
 
-                JObject elem = JObject.Parse(object1.SelectToken((string)SelectedcbItem.Content).ToString());
 
-                CurrentJsonObj = elem;
+                List<JObject> elemList = object1[(string)SelectedcbItem.Content].ToObject<List<JObject>>();
+
+                CurrentJsonObjList = elemList;
 
                 UpdateList();
 
@@ -98,6 +99,8 @@ namespace tempproj
 
         private void UpdateList()
         {
+            #region 기존코드
+            /*
             List<string> mappingNameList = CurrentJsonObj.Properties().Select(p => p.Name).ToList();
             List<JToken> mappingValueList = CurrentJsonObj.Properties().Select(p => p.Value).ToList();
 
@@ -126,10 +129,14 @@ namespace tempproj
                     MappingDataGrid.Items.Add(new MappingDataMember(true, mappingNameList[i], "", ty, tynn.ToString(), tr, fa));
                 }
             }
+            */
+            #endregion
         }
 
         private void btn_AddRow_Click(object sender, RoutedEventArgs e)
         {
+            #region 기존코드
+            /*
             String JKey = FromTextBox.Text;
             String JValue;
             try
@@ -159,17 +166,25 @@ namespace tempproj
                 StatusLabel.Content = "중복되는 컬럼이 존재합니다.";
                 return;
             }
+            */
+            #endregion
         }
         private void btn_deleteRow_Click(object sender, RoutedEventArgs e)
         {
+            #region 기존코드
+            /*
             while (MappingDataGrid.SelectedItems.Count >= 1)
             {
                 MappingDataGrid.Items.Remove(MappingDataGrid.SelectedItem);
             }
+            */
+            #endregion
         }
 
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
+            #region 기존코드
+            /*
             try
             {
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
@@ -218,6 +233,8 @@ namespace tempproj
             {
                 MessageBox.Show("같은 from값은 넣을수 없습니다");
             }
+            */
+            #endregion
         }
 
         public class MappingDataMember

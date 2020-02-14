@@ -486,12 +486,20 @@ namespace tempproj
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
-                JObject object1 = (JObject)JToken.ReadFrom(reader);
+                List<JObject> sheetList = null;
 
-                List<JObject> elemList = object1[key].ToObject<List<JObject>>();
-
+                JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                List<JObject> elemList = fullObj["회사목록"].ToObject<List<JObject>>();
+                foreach(JObject companyInfo in elemList)
+                {
+                    if( companyInfo["회사명"].ToString() == key)
+                    {
+                        sheetList = companyInfo["시트"].ToObject<List<JObject>>();
+                        break;
+                    }
+                }
                 reader.Close();
-                return elemList;
+                return sheetList;
             }
         }
 

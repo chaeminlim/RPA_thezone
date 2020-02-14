@@ -45,6 +45,8 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
+            <Label x:Name="StatusLabel" Content=""></Label>
+            <!--## 기존코드 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
@@ -80,8 +82,7 @@
                 <Button x:Name="btn_deleteRow" Content="선택 지우기" Click="btn_deleteRow_Click" ></Button>
                 <Button x:Name="btn_Save" Content="저장하기" Click="btn_Save_Click"></Button>
             </StackPanel>
-            
+         -->
         </Grid>
-
     </Grid>
 </Window>
