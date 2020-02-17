@@ -34,6 +34,7 @@ namespace tempproj
         public JObject CurrentJson { get; set; }
         public TextBox JsonTextBlock { get; set; }
         private string path = @"../../../MappingInfo.json";
+        private int EventFlag { get; set; }
 
         public MappingTable()
         {
@@ -43,54 +44,10 @@ namespace tempproj
 
             cbItems = new ObservableCollection<ComboBoxItem>();
             TheZoneItems = new ObservableCollection<ComboBoxItem>();
+
+            EventFlag = 3;
         }
 
-        
-
-
-
-        public class MappingDataMember
-        {
-            public MappingDataMember(bool isIncluded, string keystring, string valuestring, string typestring, string typenamestring, string truestring, string falsestring)
-            {
-                IsIncluded = isIncluded;
-                KeyString = keystring;
-                ValueString = valuestring;
-                TypeString = typestring;
-                TypeNameString = typenamestring;
-                TrueString = truestring;
-                FalseString = falsestring;
-            }
-
-            public bool IsIncluded
-            {
-                get; set;
-            }
-            public string KeyString
-            {
-                get; set;
-            }
-            public string ValueString
-            {
-                get; set;
-            }
-            public string TypeString
-            {
-                get; set;
-            }
-            public string TypeNameString
-            {
-                get; set;
-            }
-            public string TrueString
-            {
-                get; set;
-            }
-            public string FalseString
-            {
-                get; set;
-            }
-        }
 
         #region 콤보박스관련
         private void ClientTypeComboBox_Loaded(object sender, RoutedEventArgs e)
@@ -142,62 +99,181 @@ namespace tempproj
             String companyName = CurrentJson["회사명"].ToString();
             List<JObject> sheetList = CurrentJson["시트"].ToObject<List<JObject>>();
 
-            List<TreeViewItem> childTreeViewItemsList = new List<TreeViewItem>();
-            List<TreeViewItem> grandChildTreeViewItemsList = new List<TreeViewItem>();
+            List<TreeViewItem> sheetInfoTreeViewItemsList = new List<TreeViewItem>();
+            
+            
+
             TreeViewItem treeViewItem = new TreeViewItem
             {
                 Header = companyName
             };
+
+            sheetInfoTreeViewItemsList.Clear();
             foreach (JObject sheet in sheetList)
             {
                 String sheetName = sheet["시트이름"].ToString();
                 List<JObject> mappingList = sheet["배치표"].ToObject<List<JObject>>();
 
-                TreeViewItem childTreeViewItem = new TreeViewItem
+                TreeViewItem sheetTreeViewItem = new TreeViewItem
                 {
-                    Header = sheetName
+                    Header = "시트이름 : " + sheetName
                 };
-
-                childTreeViewItemsList.Add(childTreeViewItem);
-                treeViewItem.ItemsSource = childTreeViewItemsList;
+                List<TreeViewItem> mappingInfoTreeViewItemsList = new List<TreeViewItem>();
+                int i = 1;
                 foreach (JObject mapping in mappingList)
                 {
+                    List<TreeViewItem> cellInfoTreeViewItemsList = new List<TreeViewItem>();
+                    
                     String cellPoint = mapping["셀위치"].ToString();
                     String cellName = mapping["셀이름"].ToString();
 
-                    TreeViewItem GrandchildTreeViewItem1 = new TreeViewItem
+                    TreeViewItem cellPointTreeViewItem = new TreeViewItem
                     {
-                        Header = cellPoint
+                        Header = "셀위치 : " + cellPoint
                     };
-                    TreeViewItem GrandchildTreeViewItem2 = new TreeViewItem
-                    {
-                        Header = cellName
-                    };
-                    grandChildTreeViewItemsList.Add(GrandchildTreeViewItem1);
-                    grandChildTreeViewItemsList.Add(GrandchildTreeViewItem2);
-                    childTreeViewItem.ItemsSource = grandChildTreeViewItemsList;
 
-                    /*
+                    TreeViewItem mappingInfoTreeViewItem = new TreeViewItem
+                    {
+                        Header = "배치정보" + i++ +  " : " + cellName
+                    };
+
+                    cellInfoTreeViewItemsList.Add(cellPointTreeViewItem);
+
                     try
                     {
-                        List<JObject> toZone = mapping["더존이름"].ToObject<List<JObject>>();
-                        
-
+                        String toZones = "더존이름 : ";
+                        foreach (JValue toZone in mapping["더존이름"])
+                        {
+                            toZones += ", " + toZone.ToString();
+                        }
+                        TreeViewItem toZoneTreeViewItem = new TreeViewItem
+                        {
+                            Header = toZones
+                        };
+                        cellInfoTreeViewItemsList.Add(toZoneTreeViewItem);
                     }
-                    catch (System.ArgumentException)
+                    catch (Exception)
                     {
-                        List<String> toZone = mapping["더존이름"].ToObject<List<String>>();
+                        List<JObject> toZones = mapping["더존이름"].ToObject<List<JObject>>();
+                        foreach (JObject toZone in toZones)
+                        {
+                            String dividPoint = toZone["구분"].ToString();
+                            String values = "";
+                            foreach (JValue value in toZone["값"])
+                            {
+                                values += ", " + value.ToString();
+                            }
+                            String trueVal = toZone["True"].ToString();
+                            String falseVal = toZone["False"].ToString();
 
+                            TreeViewItem toZoneTreeViewItem = new TreeViewItem
+                            {
+                                Header = "구분 : " + dividPoint + ", " + values + ", True :" + trueVal + ", False " + falseVal
+                            };
+                            cellInfoTreeViewItemsList.Add(toZoneTreeViewItem);
+
+                        }
                     }
-                    */
-                }
-            } 
+                    
 
+                    mappingInfoTreeViewItem.ItemsSource = cellInfoTreeViewItemsList;
+                    mappingInfoTreeViewItem.Selected += MappingInfoTreeViewItem_Selected;
+                    mappingInfoTreeViewItemsList.Add(mappingInfoTreeViewItem);
+                }
+                /*
+                TreeViewItem addMappingInfoButton = new TreeViewItem
+                {
+                    Header = "추가하기"
+                };
+                addMappingInfoButton.Items.Add(new TextBox());
+                mappingInfoTreeViewItemsList.Add(addMappingInfoButton);
+                */
+                sheetTreeViewItem.ItemsSource = mappingInfoTreeViewItemsList;
+                sheetTreeViewItem.Selected += SheetTreeViewItem_Selected;
+                sheetInfoTreeViewItemsList.Add(sheetTreeViewItem);
+            }
+            treeViewItem.ItemsSource = sheetInfoTreeViewItemsList;
+            treeViewItem.Selected += TreeViewItem_Selected;
             JsonTreeView.Items.Add(treeViewItem);
 
         }
 
+
+
+        
+
+        private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            if (EventFlag >= 3)
+            {
+                Console.WriteLine(((TreeViewItem)sender).Header);
+            }
+            EventFlag = 3;
+        }
+
+        private void SheetTreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            if (EventFlag >= 2)
+            {
+                Console.WriteLine(((TreeViewItem)sender).Header);
+            }
+            EventFlag = 2;
+        }
+
+        private void MappingInfoTreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            EventFlag = 1;
+            if (EventFlag >= 1)
+            {
+                Console.WriteLine(((TreeViewItem)sender).Header);
+            }
+            
+        }
         #endregion
+
+
+        public class MappingDataMember
+        {
+            public MappingDataMember(bool isIncluded, string keystring, string valuestring, string typestring, string typenamestring, string truestring, string falsestring)
+            {
+                IsIncluded = isIncluded;
+                KeyString = keystring;
+                ValueString = valuestring;
+                TypeString = typestring;
+                TypeNameString = typenamestring;
+                TrueString = truestring;
+                FalseString = falsestring;
+            }
+
+            public bool IsIncluded
+            {
+                get; set;
+            }
+            public string KeyString
+            {
+                get; set;
+            }
+            public string ValueString
+            {
+                get; set;
+            }
+            public string TypeString
+            {
+                get; set;
+            }
+            public string TypeNameString
+            {
+                get; set;
+            }
+            public string TrueString
+            {
+                get; set;
+            }
+            public string FalseString
+            {
+                get; set;
+            }
+        }
 
 
     }

@@ -46,13 +46,19 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
             <Label x:Name="StatusLabel" Content=""></Label>
-            <Grid>
-                <TreeView x:Name="JsonTreeView">
-                </TreeView>
+            <Grid Grid.Column="0">
+                <TreeView x:Name="JsonTreeView"></TreeView>
                 <!-- 
                 <TextBox x:Name="CurrentJsonTextBox" Text=""/>
                 -->
+            </Grid>
+            <Grid Grid.Column="1">
+                
             </Grid>
             <!--## 기존코드 
             <Grid.ColumnDefinitions>
