@@ -253,14 +253,20 @@ namespace tempproj
         {
             EventFlag = 0;
             BtnDeleteJson.IsEnabled = false;
-            Console.WriteLine("셀추가핸들러");
+            EditSheetTabItem.IsEnabled = false;
+            EditMappingTabItem.IsEnabled = true;
+            EditMappingTabItem.IsSelected = true;
+
         }
 
         private void AddSheetButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
             EventFlag = 0;
             BtnDeleteJson.IsEnabled = false;
-            Console.WriteLine("시트추가핸들러");
+            EditSheetTabItem.IsEnabled = true;
+            EditSheetTabItem.IsSelected = true;
+            EditMappingTabItem.IsEnabled = false;
+
         }
 
         #endregion

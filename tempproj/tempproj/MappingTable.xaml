@@ -65,24 +65,37 @@
             </Grid>
             <Grid Grid.Column="1">
                 <TabControl>
-                    <TabItem Header="Default" x:Name="Default">
-                    </TabItem>
-                    <TabItem Header="회사추가" x:Name="EditCompanyTabItem" IsEnabled="False">
+                    <TabItem Header="회사추가" x:Name="EditCompanyTabItem" IsEnabled="True">
                         <StackPanel x:Name="EditCompanyTabItemStackPanel">
-                            <Button x:Name="EditCompanyYesButton" Content="추가"></Button>
-                            <Button x:Name="EditCompanyNoButton" Content="취소"></Button>
+                            <Label Content="회사명을 입력하세요."></Label>
+                            <TextBox x:Name="CompanyNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+
+                            <Button x:Name="EditCompanyYesButton" Content="추가" Margin="5,5,5,5"></Button>
+                            <Button x:Name="EditCompanyNoButton" Content="취소" Margin="5,5,5,5"></Button>
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="시트추가" x:Name="EditSheetTabItem" IsEnabled="False">
                         <StackPanel x:Name="EditSheetTabItemStackPanel">
-                            <Button x:Name="EditSheetYesButton" Content="추가"></Button>
-                            <Button x:Name="EditSheetNoButton" Content="취소"></Button>
+                            <Label Content="시트 이름을 입력하세요."></Label>
+                            <TextBox x:Name="SheetNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            <TextBlock x:Name="SheetFinalInfoTextBlock" Background="AliceBlue"></TextBlock>
+                            <Button x:Name="EditSheetYesButton" Content="추가" Margin="5,5,5,5"></Button>
+                            <Button x:Name="EditSheetNoButton" Content="취소" Margin="5,5,5,5"></Button>
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="배치정보추가" x:Name="EditMappingTabItem" IsEnabled="False">
                         <StackPanel x:Name="EditMappingTabItemStackPanel">
-                            <Button x:Name="EditMappingYesButton" Content="추가"></Button>
-                            <Button x:Name="EditMappingNoButton" Content="취소"></Button>
+                            <Label Content="셀 위치를 입력하세요."></Label>
+                            <TextBox x:Name="cellPointTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            <Label Content="셀 이름을 입력하세요."></Label>
+                            <TextBox x:Name="cellNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            <Label Content="더존 이름을 입력하세요."></Label>
+                            <TextBox x:Name="theZoneNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            <Button x:Name="btnAddMoreTheZoneInfo" Content="더존 대상 더 추가하기" Background="AliceBlue"></Button>
+                            <ListBox BorderBrush="AliceBlue" BorderThickness="4" Margin="5,5,5,5"></ListBox>
+                            <TextBlock x:Name="MappingFinalInfoTextBlock" Background="AliceBlue"></TextBlock>
+                            <Button x:Name="EditMappingYesButton" Content="추가" Margin="5,5,5,5"></Button>
+                            <Button x:Name="EditMappingNoButton" Content="취소" Margin="5,5,5,5"></Button>
                         </StackPanel>
                     </TabItem>
                 </TabControl>
