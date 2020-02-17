@@ -28,7 +28,7 @@ namespace tempproj
     {
         public ObservableCollection<ComboBoxItem> cbItems { get; set; }
         public ObservableCollection<ComboBoxItem> TheZoneItems { get; set; }
-        private List<JObject> CurrentJsonObjList;
+        private Tuple<String, String, String> CurrentSelectedObjInfo;
         public ComboBoxItem SelectedcbItem { get; set; }
         public ComboBoxItem SelectedtzItem { get; set; }
         public JObject CurrentJson { get; set; }
@@ -50,6 +50,8 @@ namespace tempproj
 
 
         #region 콤보박스관련
+        #region 콤보박스 처리(not eventHandler)
+
         private void ClientTypeComboBox_Loaded(object sender, RoutedEventArgs e)
         {
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
@@ -65,9 +67,15 @@ namespace tempproj
                 reader.Close();
             }
         }
-
         private void ClientTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
+            UpdateJsonTreeView();
+        }
+
+        private void UpdateJsonTreeView()
+        {
+            this.JsonTreeView.Items.Clear();
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -75,7 +83,7 @@ namespace tempproj
 
                 JObject fullObj = (JObject)JToken.ReadFrom(reader);
                 List<JObject> elemList = fullObj["회사목록"].ToObject<List<JObject>>();
-                
+
                 foreach (JObject companyInfo in elemList)
                 {
                     if (companyInfo["회사명"].ToString() == (string)SelectedcbItem.Content)
@@ -89,19 +97,9 @@ namespace tempproj
                 CurrentJson = currentCompanyInfo;
             }
 
-            UpdateJsonTreeView();
-        }
-
-        private void UpdateJsonTreeView()
-        {
-            this.JsonTreeView.Items.Clear();
-
             String companyName = CurrentJson["회사명"].ToString();
             List<JObject> sheetList = CurrentJson["시트"].ToObject<List<JObject>>();
-
             List<TreeViewItem> sheetInfoTreeViewItemsList = new List<TreeViewItem>();
-            
-            
 
             TreeViewItem treeViewItem = new TreeViewItem
             {
@@ -116,7 +114,8 @@ namespace tempproj
 
                 TreeViewItem sheetTreeViewItem = new TreeViewItem
                 {
-                    Header = "시트이름 : " + sheetName
+                    Header = "시트이름 : " + sheetName,
+                    Tag = sheetName
                 };
                 List<TreeViewItem> mappingInfoTreeViewItemsList = new List<TreeViewItem>();
                 int i = 1;
@@ -134,9 +133,11 @@ namespace tempproj
 
                     TreeViewItem mappingInfoTreeViewItem = new TreeViewItem
                     {
-                        Header = "배치정보" + i++ +  " : " + cellName
+                        Header = "배치정보" + i++ +  " : " + cellName,
+                        Tag = new Tuple<String, String>(cellName, sheetName) 
                     };
 
+                    cellPointTreeViewItem.Selected += CellPointTreeViewItem_Selected;
                     cellInfoTreeViewItemsList.Add(cellPointTreeViewItem);
 
                     try
@@ -148,8 +149,11 @@ namespace tempproj
                         }
                         TreeViewItem toZoneTreeViewItem = new TreeViewItem
                         {
-                            Header = toZones
+                            Header = toZones,
+                            
                         };
+
+                        toZoneTreeViewItem.Selected += CellPointTreeViewItem_Selected;
                         cellInfoTreeViewItemsList.Add(toZoneTreeViewItem);
                     }
                     catch (Exception)
@@ -170,28 +174,33 @@ namespace tempproj
                             {
                                 Header = "구분 : " + dividPoint + ", " + values + ", True :" + trueVal + ", False " + falseVal
                             };
+                            toZoneTreeViewItem.Selected += CellPointTreeViewItem_Selected;
                             cellInfoTreeViewItemsList.Add(toZoneTreeViewItem);
 
                         }
                     }
                     
-
                     mappingInfoTreeViewItem.ItemsSource = cellInfoTreeViewItemsList;
                     mappingInfoTreeViewItem.Selected += MappingInfoTreeViewItem_Selected;
                     mappingInfoTreeViewItemsList.Add(mappingInfoTreeViewItem);
                 }
-                /*
-                TreeViewItem addMappingInfoButton = new TreeViewItem
+
+                TreeViewItem addCellButtonTreeViewItem = new TreeViewItem()
                 {
-                    Header = "추가하기"
+                    Header = "셀 추가하기"
                 };
-                addMappingInfoButton.Items.Add(new TextBox());
-                mappingInfoTreeViewItemsList.Add(addMappingInfoButton);
-                */
+                addCellButtonTreeViewItem.Selected += AddCellButtonTreeViewItem_Selected;
+                mappingInfoTreeViewItemsList.Add(addCellButtonTreeViewItem);
                 sheetTreeViewItem.ItemsSource = mappingInfoTreeViewItemsList;
                 sheetTreeViewItem.Selected += SheetTreeViewItem_Selected;
                 sheetInfoTreeViewItemsList.Add(sheetTreeViewItem);
             }
+            TreeViewItem addSheetButtonTreeViewItem = new TreeViewItem()
+            {
+                Header = "시트 추가하기"
+            };
+            addSheetButtonTreeViewItem.Selected += AddSheetButtonTreeViewItem_Selected;
+            sheetInfoTreeViewItemsList.Add(addSheetButtonTreeViewItem);
             treeViewItem.ItemsSource = sheetInfoTreeViewItemsList;
             treeViewItem.Selected += TreeViewItem_Selected;
             JsonTreeView.Items.Add(treeViewItem);
@@ -200,13 +209,16 @@ namespace tempproj
 
 
 
-        
+
+        #endregion
+        #region 이벤트 핸들러
 
         private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
             if (EventFlag >= 3)
             {
-                Console.WriteLine(((TreeViewItem)sender).Header);
+                CurrentSelectedObjInfo = new Tuple<String, String, String>("COMPANY", (String)((TreeViewItem)sender).Header, "");
+                BtnDeleteJson.IsEnabled = false;
             }
             EventFlag = 3;
         }
@@ -215,66 +227,131 @@ namespace tempproj
         {
             if (EventFlag >= 2)
             {
-                Console.WriteLine(((TreeViewItem)sender).Header);
+                CurrentSelectedObjInfo = new Tuple<String, String, String>("SHEET", (String)((TreeViewItem)sender).Tag, null);
+                BtnDeleteJson.IsEnabled = true;
             }
             EventFlag = 2;
         }
 
         private void MappingInfoTreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
-            EventFlag = 1;
             if (EventFlag >= 1)
             {
-                Console.WriteLine(((TreeViewItem)sender).Header);
+                CurrentSelectedObjInfo = new Tuple<String, String, String>("MAPPING", ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item1, ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item2);
+                BtnDeleteJson.IsEnabled = true;
             }
-            
+            EventFlag = 1;
+
         }
+        private void CellPointTreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            EventFlag = 0;
+            BtnDeleteJson.IsEnabled = false;
+        }
+
+        private void AddCellButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            EventFlag = 0;
+            BtnDeleteJson.IsEnabled = false;
+            Console.WriteLine("셀추가핸들러");
+        }
+
+        private void AddSheetButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            EventFlag = 0;
+            BtnDeleteJson.IsEnabled = false;
+            Console.WriteLine("시트추가핸들러");
+        }
+
+        #endregion
         #endregion
 
 
-        public class MappingDataMember
+        #region 버튼 처리기
+        
+        private void BtnDeleteJson_Click(object sender, RoutedEventArgs e)
         {
-            public MappingDataMember(bool isIncluded, string keystring, string valuestring, string typestring, string typenamestring, string truestring, string falsestring)
+            String jsonType = CurrentSelectedObjInfo.Item1;
+            String jsonName = CurrentSelectedObjInfo.Item2;
+            String jsonSheet = CurrentSelectedObjInfo.Item3;
+
+            // JObject CurrentJson
+            if (jsonType == "SHEET")
             {
-                IsIncluded = isIncluded;
-                KeyString = keystring;
-                ValueString = valuestring;
-                TypeString = typestring;
-                TypeNameString = typenamestring;
-                TrueString = truestring;
-                FalseString = falsestring;
+
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                    //List<JObject> elemList = fullObj["회사목록"].ToObject<List<JObject>>();
+                    foreach (JObject companyInfo in fullObj["회사목록"])
+                    {
+                        if (companyInfo["회사명"].ToString() == CurrentJson["회사명"].ToString())
+                        {
+                            foreach(JObject sheetInfo in companyInfo["시트"])
+                            {
+                                if (sheetInfo["시트이름"].ToString() == jsonName)
+                                {
+                                    sheetInfo.Remove();
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                    reader.Close();
+                    File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+                }
+                
+            }
+            else if (jsonType == "MAPPING")
+            {
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject fullObj = (JObject)JToken.ReadFrom(reader);
+
+                    foreach (JObject companyInfo in fullObj["회사목록"])
+                    {
+                        if (companyInfo["회사명"].ToString() == CurrentJson["회사명"].ToString())
+                        {
+                            foreach (JObject sheetInfo in companyInfo["시트"])
+                            {
+                                if (sheetInfo["시트이름"].ToString() == jsonSheet)
+                                {
+                                    JToken temp = sheetInfo["배치표"];
+                                    foreach (JObject mappingInfo in sheetInfo["배치표"])
+                                    {
+                                        if(mappingInfo["셀이름"].ToString() == jsonName)
+                                        {
+                                            mappingInfo.Remove();
+                                            break;
+                                        }
+
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                    reader.Close();
+                    File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+                }
+            }
+            else
+            {
+                //error
             }
 
-            public bool IsIncluded
-            {
-                get; set;
-            }
-            public string KeyString
-            {
-                get; set;
-            }
-            public string ValueString
-            {
-                get; set;
-            }
-            public string TypeString
-            {
-                get; set;
-            }
-            public string TypeNameString
-            {
-                get; set;
-            }
-            public string TrueString
-            {
-                get; set;
-            }
-            public string FalseString
-            {
-                get; set;
-            }
+            UpdateJsonTreeView();
         }
 
+        #endregion
 
     }
 

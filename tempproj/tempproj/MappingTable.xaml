@@ -50,14 +50,42 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="StatusLabel" Content=""></Label>
             <Grid Grid.Column="0">
-                <TreeView x:Name="JsonTreeView"></TreeView>
-                <!-- 
-                <TextBox x:Name="CurrentJsonTextBox" Text=""/>
-                -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="12*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <TreeView  x:Name="JsonTreeView"></TreeView>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Button x:Name="BtnDeleteJson" Margin="5, 5, 5, 5" Content="삭제하기" IsEnabled="False" Click="BtnDeleteJson_Click"></Button>
+                </Grid>
+                
             </Grid>
             <Grid Grid.Column="1">
+                <TabControl>
+                    <TabItem Header="Default" x:Name="Default">
+                    </TabItem>
+                    <TabItem Header="회사추가" x:Name="EditCompanyTabItem" IsEnabled="False">
+                        <StackPanel x:Name="EditCompanyTabItemStackPanel">
+                            <Button x:Name="EditCompanyYesButton" Content="추가"></Button>
+                            <Button x:Name="EditCompanyNoButton" Content="취소"></Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="시트추가" x:Name="EditSheetTabItem" IsEnabled="False">
+                        <StackPanel x:Name="EditSheetTabItemStackPanel">
+                            <Button x:Name="EditSheetYesButton" Content="추가"></Button>
+                            <Button x:Name="EditSheetNoButton" Content="취소"></Button>
+                        </StackPanel>
+                    </TabItem>
+                    <TabItem Header="배치정보추가" x:Name="EditMappingTabItem" IsEnabled="False">
+                        <StackPanel x:Name="EditMappingTabItemStackPanel">
+                            <Button x:Name="EditMappingYesButton" Content="추가"></Button>
+                            <Button x:Name="EditMappingNoButton" Content="취소"></Button>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
                 
             </Grid>
             <!--## 기존코드 

@@ -198,27 +198,24 @@ namespace tempproj
                 return;
             ///
 
-            //재원씨---------------------------------------------------------------------------------------------------------------------
             List<string> clientNames = new List<string>();
-            //재원씨---------------------------------------------------------------------------------------------------------------------
             try
             {
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
-                    JObject object1 = (JObject)JToken.ReadFrom(reader);
-                    List<string> clientList = object1.Properties().Select(p => p.Name).ToList();
+                    JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                    List<JObject> clientList = fullObj["회사목록"].ToObject<List<JObject>>();
 
-                    foreach (string clientName in clientList)
+                    foreach (JObject client in clientList)
                     {
-                        clientNames.Add(clientName);
+                        clientNames.Add(client["회사명"].ToString());
                     }
 
                     reader.Close();
                 }
 
             }
-            //재원씨---------------------------------------------------------------------------------------------------------------------
             catch (System.IO.FileNotFoundException)
             {
                 return;
@@ -236,7 +233,6 @@ namespace tempproj
                 AddToWorkQueueAndList(ExcelListView, ExcelWorkQueue, dataStructObj);
             }
         }
-        //재원씨---------------------------------------------------------------------------------------------------------------------
         private void btn_MappingTable_Click(object sender, RoutedEventArgs e)
         {
             MappingTable mappingTable = new MappingTable();
