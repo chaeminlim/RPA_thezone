@@ -64,14 +64,14 @@
                 
             </Grid>
             <Grid Grid.Column="1">
-                <TabControl>
+                <TabControl ScrollViewer.VerticalScrollBarVisibility="Visible">
                     <TabItem Header="회사추가" x:Name="EditCompanyTabItem" IsEnabled="True">
                         <StackPanel x:Name="EditCompanyTabItemStackPanel">
                             <Label Content="회사명을 입력하세요."></Label>
                             <TextBox x:Name="CompanyNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
 
-                            <Button x:Name="EditCompanyYesButton" Content="추가" Margin="5,5,5,5"></Button>
-                            <Button x:Name="EditCompanyNoButton" Content="취소" Margin="5,5,5,5"></Button>
+                            <Button x:Name="EditCompanyYesButton" Content="추가" Margin="5,5,5,5" Click="EditCompanyYesButton_Click"></Button>
+                            <Button x:Name="EditCompanyNoButton" Content="취소" Margin="5,5,5,5" Click="EditCompanyNoButton_Click"></Button>
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="시트추가" x:Name="EditSheetTabItem" IsEnabled="False">
@@ -79,24 +79,52 @@
                             <Label Content="시트 이름을 입력하세요."></Label>
                             <TextBox x:Name="SheetNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
                             <TextBlock x:Name="SheetFinalInfoTextBlock" Background="AliceBlue"></TextBlock>
-                            <Button x:Name="EditSheetYesButton" Content="추가" Margin="5,5,5,5"></Button>
-                            <Button x:Name="EditSheetNoButton" Content="취소" Margin="5,5,5,5"></Button>
+                            <Button x:Name="EditSheetYesButton" Content="추가" Margin="5,5,5,5" Click="EditSheetYesButton_Click"></Button>
+                            <Button x:Name="EditSheetNoButton" Content="취소" Margin="5,5,5,5" Click="EditSheetNoButton_Click"></Button>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="배치정보추가" x:Name="EditMappingTabItem" IsEnabled="False">
-                        <StackPanel x:Name="EditMappingTabItemStackPanel">
-                            <Label Content="셀 위치를 입력하세요."></Label>
-                            <TextBox x:Name="cellPointTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
-                            <Label Content="셀 이름을 입력하세요."></Label>
-                            <TextBox x:Name="cellNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
-                            <Label Content="더존 이름을 입력하세요."></Label>
-                            <TextBox x:Name="theZoneNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
-                            <Button x:Name="btnAddMoreTheZoneInfo" Content="더존 대상 더 추가하기" Background="AliceBlue"></Button>
-                            <ListBox BorderBrush="AliceBlue" BorderThickness="4" Margin="5,5,5,5"></ListBox>
-                            <TextBlock x:Name="MappingFinalInfoTextBlock" Background="AliceBlue"></TextBlock>
-                            <Button x:Name="EditMappingYesButton" Content="추가" Margin="5,5,5,5"></Button>
-                            <Button x:Name="EditMappingNoButton" Content="취소" Margin="5,5,5,5"></Button>
-                        </StackPanel>
+                    <TabItem Header="배치정보추가" x:Name="EditMappingTabItem" IsEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <ScrollViewer>
+                            <StackPanel x:Name="EditMappingTabItemStackPanel" CanVerticallyScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                <Label Content="구분이 필요하면 체크박스를 선택하세요."></Label>
+                                <CheckBox x:Name="divisionCheckBox"></CheckBox>
+
+                                <Label Content="시트 이름를 입력하세요."></Label>
+                                <TextBox x:Name="sheetNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            
+                                <Label Content="셀 위치를 입력하세요."></Label>
+                                <TextBox x:Name="cellPointTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            
+                                <Label Content="셀 이름을 입력하세요."></Label>
+                                <TextBox x:Name="cellNameTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                            
+                                <Label Content="더존 이름을 입력하세요."></Label>
+                                <TextBox x:Name="theZoneTrueTextBox" BorderBrush="AliceBlue" BorderThickness="4"></TextBox>
+                                <Button x:Name="btnTheZoneTrueListBox" Click="btnTheZoneTrueListBox_Click" Content="더존 대상 추가하기" Background="AliceBlue"></Button>
+                                <Button x:Name="btnClearTheZoneTrueListBox" Click="btnClearTheZoneTrueListBox_Click" Content="모두 삭제" Background="AliceBlue"></Button>
+                                <ListBox x:Name="theZoneTrueListBox" BorderBrush="AliceBlue" BorderThickness="4" Margin="5,5,5,5"></ListBox>
+
+                                <Label Content="구분을 입력하세요." ></Label>
+                                <TextBox x:Name="divisionTextBox" Background="AliceBlue"></TextBox>
+
+                                <Label Content="값을 입력하세요." ></Label>
+                                <TextBox x:Name="valueCheckTextBox" Background="AliceBlue"></TextBox>
+                                <Button x:Name="btnvalueCheckListBox" Click="btnvalueCheckListBox_Click" Content="값 대상 추가하기" Background="AliceBlue"></Button>
+                                <Button x:Name="btnClearvalueCheckListBox" Click="btnClearvalueCheckListBox_Click" Content="모두 삭제" Background="AliceBlue"></Button>
+                                <ListBox x:Name="valueCheckListBox" BorderBrush="AliceBlue" BorderThickness="4" Margin="5,5,5,5"></ListBox>
+
+                                <Label Content="False" ></Label>
+                                <TextBox  x:Name="theZoneFalseTextBox" Background="AliceBlue"></TextBox>
+                                <Button x:Name="btnTheZoneFalseListBox" Click="btnTheZoneFalseListBox_Click" Content="False 대상 추가하기" Background="AliceBlue"></Button>
+                                <Button x:Name="btnClearTheZoneFalseListBox" Click="btnClearTheZoneFalseListBox_Click" Content="모두 삭제" Background="AliceBlue"></Button>
+                                <ListBox x:Name="theZoneFalseListBox" BorderBrush="AliceBlue" BorderThickness="4" Margin="5,5,5,5"></ListBox>
+
+                                <TextBlock x:Name="MappingFinalInfoTextBlock" Background="AliceBlue"></TextBlock>
+
+                                <Button x:Name="EditMappingYesButton" Content="추가" Margin="5,5,5,5" Click="EditMappingYesButton_Click"></Button>
+                                <Button x:Name="EditMappingNoButton" Content="취소" Margin="5,5,5,5" Click="EditMappingNoButton_Click"></Button>
+                            </StackPanel>
+                        </ScrollViewer>
                     </TabItem>
                 </TabControl>
                 

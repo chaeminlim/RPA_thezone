@@ -54,6 +54,12 @@ namespace tempproj
 
         private void ClientTypeComboBox_Loaded(object sender, RoutedEventArgs e)
         {
+            if(cbItems == null)
+            {
+                return;
+            }
+            cbItems.Clear();
+
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -66,16 +72,52 @@ namespace tempproj
                 }
                 reader.Close();
             }
+
+        }
+
+        private void ClientTypeComboBox_ReLoad(String companyNameParam)
+        {
+
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                List<JObject> companyList = fullObj["회사목록"].ToObject<List<JObject>>();
+
+                cbItems.Clear();
+
+                foreach (JObject companyJsonObj in companyList)
+                {
+                    cbItems.Add(new ComboBoxItem { Content = companyJsonObj["회사명"].ToString() });
+                }
+                reader.Close();
+            }
+
+            foreach (ComboBoxItem cbi in cbItems)
+            {
+                if (cbi.Content.ToString() == companyNameParam)
+                {
+                    SelectedcbItem = cbi;
+                    break;
+                }
+            }
         }
         private void ClientTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
-            UpdateJsonTreeView();
+            try
+            {
+                UpdateJsonTreeView();
+            }
+            catch(System.NullReferenceException)
+            {
+                JsonTreeView.Items.Clear();
+            }
         }
 
-        private void UpdateJsonTreeView()
+        private void UpdateJsonTreeView(String companyNameParam = null)
         {
-            this.JsonTreeView.Items.Clear();
+            JsonTreeView.Items.Clear();
+            
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -86,11 +128,24 @@ namespace tempproj
 
                 foreach (JObject companyInfo in elemList)
                 {
-                    if (companyInfo["회사명"].ToString() == (string)SelectedcbItem.Content)
+                    String tempCompName = "";
+                    if (companyNameParam == null)
+                        tempCompName = (string)SelectedcbItem.Content;
+                    else
+                    {
+                        tempCompName = companyNameParam;
+                    }
+                   
+                    if (companyInfo["회사명"].ToString() == tempCompName)
                     {
                         currentCompanyInfo = companyInfo;
                         break;
                     }
+                }
+
+                if(currentCompanyInfo == null)
+                {
+                    return;
                 }
 
                 reader.Close();
@@ -187,10 +242,12 @@ namespace tempproj
 
                 TreeViewItem addCellButtonTreeViewItem = new TreeViewItem()
                 {
-                    Header = "셀 추가하기"
+                    Header = "셀 추가하기",
+                    Tag =  sheetName
                 };
                 addCellButtonTreeViewItem.Selected += AddCellButtonTreeViewItem_Selected;
                 mappingInfoTreeViewItemsList.Add(addCellButtonTreeViewItem);
+                sheetTreeViewItem.IsExpanded = true;
                 sheetTreeViewItem.ItemsSource = mappingInfoTreeViewItemsList;
                 sheetTreeViewItem.Selected += SheetTreeViewItem_Selected;
                 sheetInfoTreeViewItemsList.Add(sheetTreeViewItem);
@@ -201,6 +258,7 @@ namespace tempproj
             };
             addSheetButtonTreeViewItem.Selected += AddSheetButtonTreeViewItem_Selected;
             sheetInfoTreeViewItemsList.Add(addSheetButtonTreeViewItem);
+            treeViewItem.IsExpanded = true;
             treeViewItem.ItemsSource = sheetInfoTreeViewItemsList;
             treeViewItem.Selected += TreeViewItem_Selected;
             JsonTreeView.Items.Add(treeViewItem);
@@ -210,15 +268,19 @@ namespace tempproj
 
 
 
+
+
         #endregion
         #region 이벤트 핸들러
-
         private void TreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
             if (EventFlag >= 3)
             {
                 CurrentSelectedObjInfo = new Tuple<String, String, String>("COMPANY", (String)((TreeViewItem)sender).Header, "");
-                BtnDeleteJson.IsEnabled = false;
+                BtnDeleteJson.IsEnabled = true;
+                EditSheetTabItem.IsEnabled = false;
+                EditMappingTabItem.IsEnabled = false;
+                EditCompanyTabItem.IsSelected = true;
             }
             EventFlag = 3;
         }
@@ -229,6 +291,9 @@ namespace tempproj
             {
                 CurrentSelectedObjInfo = new Tuple<String, String, String>("SHEET", (String)((TreeViewItem)sender).Tag, null);
                 BtnDeleteJson.IsEnabled = true;
+                EditSheetTabItem.IsEnabled = false;
+                EditMappingTabItem.IsEnabled = false;
+                EditCompanyTabItem.IsSelected = true;
             }
             EventFlag = 2;
         }
@@ -239,6 +304,9 @@ namespace tempproj
             {
                 CurrentSelectedObjInfo = new Tuple<String, String, String>("MAPPING", ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item1, ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item2);
                 BtnDeleteJson.IsEnabled = true;
+                EditSheetTabItem.IsEnabled = false;
+                EditMappingTabItem.IsEnabled = false;
+                EditCompanyTabItem.IsSelected = true;
             }
             EventFlag = 1;
 
@@ -247,6 +315,8 @@ namespace tempproj
         {
             EventFlag = 0;
             BtnDeleteJson.IsEnabled = false;
+            EditSheetTabItem.IsEnabled = false;
+            EditMappingTabItem.IsEnabled = false;
         }
 
         private void AddCellButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
@@ -272,8 +342,7 @@ namespace tempproj
         #endregion
         #endregion
 
-
-        #region 버튼 처리기
+        #region 삭제 버튼
         
         private void BtnDeleteJson_Click(object sender, RoutedEventArgs e)
         {
@@ -282,7 +351,30 @@ namespace tempproj
             String jsonSheet = CurrentSelectedObjInfo.Item3;
 
             // JObject CurrentJson
-            if (jsonType == "SHEET")
+            if(jsonType == "COMPANY")
+            {
+                using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                    //List<JObject> elemList = fullObj["회사목록"].ToObject<List<JObject>>();
+                    foreach (JObject companyInfo in fullObj["회사목록"])
+                    {
+                        if (companyInfo["회사명"].ToString() == jsonName)
+                        {
+                            companyInfo.Remove();
+                            break;
+                        }
+                    }
+
+                    string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                    reader.Close();
+                    File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+                }
+                ClientTypeComboBox_ReLoad(jsonName);
+                UpdateJsonTreeView("");
+            }
+            else if (jsonType == "SHEET")
             {
 
                 using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
@@ -310,7 +402,7 @@ namespace tempproj
                     reader.Close();
                     File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
                 }
-                
+                UpdateJsonTreeView();
             }
             else if (jsonType == "MAPPING")
             {
@@ -348,17 +440,233 @@ namespace tempproj
                     reader.Close();
                     File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
                 }
+                UpdateJsonTreeView();
             }
             else
             {
                 //error
             }
 
-            UpdateJsonTreeView();
+
         }
 
         #endregion
 
+        #region 정보 추가 기능
+        #region 추가기능 
+        private void EditCompanyYesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(CompanyNameTextBox.Text == "")
+            {
+                MessageBox.Show("회사명을 입력하세요.");
+                return;
+            }
+            String tempCompName = CompanyNameTextBox.Text;
+
+            dynamic companyObj = new JObject();
+            companyObj.회사명 = CompanyNameTextBox.Text;
+            companyObj.시트 = new JArray();
+
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                ((JArray)fullObj["회사목록"]).Add(companyObj);
+
+                string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                reader.Close();
+                File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+            }
+
+            ClientTypeComboBox_ReLoad(tempCompName);
+            UpdateJsonTreeView(tempCompName);
+        }
+
+        private void EditSheetYesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SheetNameTextBox.Text == "")
+            {
+                MessageBox.Show("시트이름을 입력하세요.");
+                return;
+            }
+
+            dynamic sheetObj = new JObject();
+            sheetObj.시트이름 = SheetNameTextBox.Text;
+            sheetObj.배치표 = new JArray();
+            String tempCompName = CurrentJson["회사명"].ToString();
+
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                foreach (JObject companyInfo in fullObj["회사목록"])
+                {
+                    if (companyInfo["회사명"].ToString() == CurrentJson["회사명"].ToString())
+                    {
+                        ((JArray)companyInfo["시트"]).Add(sheetObj);
+                        break;
+                    }
+                }
+
+                string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                reader.Close();
+                File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+            }
+
+            ClientTypeComboBox_ReLoad(tempCompName);
+            UpdateJsonTreeView(tempCompName);
+        }
+
+
+        private void EditMappingYesButton_Click(object sender, RoutedEventArgs e)
+        {
+            String cellPoint = cellPointTextBox.Text;
+            String cellName = cellNameTextBox.Text;
+            String division = divisionTextBox.Text;
+            String sheetName = sheetNameTextBox.Text;
+            String tempCompName = CurrentJson["회사명"].ToString();
+
+            List<String> valueCheckList = new List<string>();
+            List<String> theZoneTrueList = new List<String>();
+            List<String> theZoneFalseList = new List<String>();
+
+            foreach (String listBoxItem in theZoneTrueListBox.Items)
+                valueCheckList.Add(listBoxItem);
+            foreach (String listBoxItem in theZoneTrueListBox.Items)
+                theZoneTrueList.Add(listBoxItem);
+            foreach (String listBoxItem in theZoneFalseListBox.Items)
+                theZoneFalseList.Add(listBoxItem);
+            
+            dynamic mappingObj = new JObject();
+
+            if ((bool)divisionCheckBox.IsChecked)
+            {
+                mappingObj = new JObject();
+                mappingObj.셀위치 = cellPoint;
+                mappingObj.셀이름 = cellName;
+                dynamic mappingtzInfo = new JObject();
+                mappingtzInfo.구분 = division;
+                mappingtzInfo.값 = new JArray(valueCheckList);
+
+                try
+                {
+                    mappingtzInfo.True = theZoneTrueList[0];
+                    mappingtzInfo.False = theZoneFalseList[0];
+                }
+                catch (System.ArgumentOutOfRangeException)
+                {
+                    MessageBox.Show("값을 올바르게 입력하세요.\n" +
+                        "리스트 박스에 값이 추가되지 않았습니다.");
+                    return;
+                }
+
+                mappingObj.더존이름 = new JArray(mappingtzInfo);
+            }
+            else // 일반경우
+            {
+                mappingObj = new JObject();
+                mappingObj.셀위치 = cellPoint;
+                mappingObj.셀이름 = cellName;
+                mappingObj.더존이름 = new JArray(theZoneTrueList);
+
+            }
+            using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject fullObj = (JObject)JToken.ReadFrom(reader);
+                foreach (JObject companyInfo in fullObj["회사목록"])
+                {
+                    if (companyInfo["회사명"].ToString() == CurrentJson["회사명"].ToString())
+                    {
+                        foreach (JObject sheetInfo in companyInfo["시트"])
+                        {
+                            int flag = 0;
+                            if (sheetInfo["시트이름"].ToString() == sheetName)
+                            {
+                                flag = 1;
+                                ((JArray)sheetInfo["배치표"]).Add(mappingObj);
+                                break;
+                            }
+                            if(flag == 0)
+                            {
+                                MessageBox.Show("시트 정보가 잘못되었습니다.");
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                }
+                string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                reader.Close();
+                File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
+            }
+
+            ClientTypeComboBox_ReLoad(tempCompName);
+            UpdateJsonTreeView(tempCompName);
+        }
+
+        private void btnvalueCheckListBox_Click(object sender, RoutedEventArgs e)
+        {
+            valueCheckListBox.Items.Add(valueCheckTextBox.Text);
+            valueCheckTextBox.Clear();
+        }
+
+        private void btnTheZoneTrueListBox_Click(object sender, RoutedEventArgs e)
+        {
+            theZoneTrueListBox.Items.Add(theZoneTrueTextBox.Text);
+            theZoneTrueTextBox.Clear();
+        }
+
+        private void btnTheZoneFalseListBox_Click(object sender, RoutedEventArgs e)
+        {
+            theZoneFalseListBox.Items.Add(theZoneFalseTextBox.Text);
+            theZoneFalseTextBox.Clear();
+        }
+
+        private void btnClearTheZoneFalseListBox_Click(object sender, RoutedEventArgs e)
+        {
+            theZoneFalseListBox.Items.Clear();
+        }
+
+        private void btnClearvalueCheckListBox_Click(object sender, RoutedEventArgs e)
+        {
+            valueCheckListBox.Items.Clear();
+        }
+
+        private void btnClearTheZoneTrueListBox_Click(object sender, RoutedEventArgs e)
+        {
+            theZoneTrueListBox.Items.Clear();
+        }
+        #endregion
+        #region 취소기능
+
+        private void EditCompanyNoButton_Click(object sender, RoutedEventArgs e)
+        {
+            CompanyNameTextBox.Clear();
+        }
+
+        private void EditSheetNoButton_Click(object sender, RoutedEventArgs e)
+        {
+            SheetNameTextBox.Clear();
+        }
+        
+        private void EditMappingNoButton_Click(object sender, RoutedEventArgs e)
+        {
+            cellPointTextBox.Clear();
+            cellNameTextBox.Clear();
+            theZoneTrueTextBox.Clear();
+            divisionTextBox.Clear();
+            valueCheckTextBox.Clear();
+            theZoneFalseTextBox.Clear();
+            theZoneTrueListBox.Items.Clear();
+            theZoneFalseListBox.Items.Clear();
+        }
+
+        #endregion
+
+        #endregion
+
+        
     }
 
     #region 기존코드
@@ -466,5 +774,5 @@ namespace tempproj
         #endregion
     }
     */
-    #endregion
+    #endregion  
 }
