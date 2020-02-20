@@ -227,7 +227,7 @@ namespace tempproj
 
                             TreeViewItem toZoneTreeViewItem = new TreeViewItem
                             {
-                                Header = "구분 : " + dividPoint + ", " + values + ", True :" + trueVal + ", False " + falseVal
+                                Header = "구분 : " + dividPoint + "\n값 : " + values + "\nTrue :" + trueVal + "\nFalse " + falseVal
                             };
                             toZoneTreeViewItem.Selected += CellPointTreeViewItem_Selected;
                             cellInfoTreeViewItemsList.Add(toZoneTreeViewItem);
