@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <ToolBar>
-                <Button x:Name="btn_MappingTable" Content="매핑 테이블 수정하기" Click="btn_MappingTable_Click"></Button>
+                <Button x:Name="btn_MappingTable" Content="배치표 수정하기" Click="btn_MappingTable_Click"></Button>
             </ToolBar>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">

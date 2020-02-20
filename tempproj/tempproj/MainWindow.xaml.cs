@@ -190,7 +190,7 @@ namespace tempproj
         private void btnOpenFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls";
+            openFileDialog.Filter = "Excel (*.xlsx)|*.xlsx|Excel 97-2003 (*.xls)|*.xls| Excel Files(*.xlsm)|*.xlsm";
             openFileDialog.Multiselect = true;
 
 
@@ -239,6 +239,9 @@ namespace tempproj
             try
             {
                 mappingTable.ShowDialog();
+                MessageBox.Show("프로그램을 재시작합니다.");
+                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                Application.Current.Shutdown();
             }
             catch (System.InvalidOperationException)
             {
@@ -246,6 +249,7 @@ namespace tempproj
                 mappingTable.Close();
             } //더블클릭 Exception 방지
         }
+
 
         private void AddToWorkQueueAndList(ListView ExcelListView, List<ExcelWorkQueueDataStruct> ExcelWorkQueue, ExcelWorkQueueDataStruct dataStructObj)
         {
