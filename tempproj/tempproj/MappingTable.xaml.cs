@@ -530,7 +530,7 @@ namespace tempproj
             List<String> theZoneTrueList = new List<String>();
             List<String> theZoneFalseList = new List<String>();
 
-            foreach (String listBoxItem in theZoneTrueListBox.Items)
+            foreach (String listBoxItem in valueCheckListBox.Items)
                 valueCheckList.Add(listBoxItem);
             foreach (String listBoxItem in theZoneTrueListBox.Items)
                 theZoneTrueList.Add(listBoxItem);
