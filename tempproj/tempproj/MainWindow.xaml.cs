@@ -38,6 +38,7 @@ namespace tempproj
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
         private string path = @"../../../MappingInfo.json";
         private double scr = double.MaxValue;
+        
 
         public MainWindow()
         {
@@ -424,6 +425,35 @@ namespace tempproj
                       System.Windows.Threading.DispatcherPriority.Background,
                       new System.Threading.ThreadStart(delegate { }));
         }
+
+        private int LCS(String filename, String comp)
+        {
+            int[,] lcs = new int[100, 100];
+            String str1 = '0' + filename;
+            String str2 = '0' + comp;
+            for(int i = 0; i < str1.Length; i++)
+            {
+                for(int j = 0; j < str2.Length; j++)
+                {
+                    if (i == 0 || j == 0)
+                    {
+                        lcs[i,j] = 0;
+                        continue;
+                    }
+                    if (str1[i] == str2[j])
+                        lcs[i, j] = lcs[i - 1, j - 1] + 1;
+                    else
+                    {
+                        if (lcs[i - 1, j] > lcs[i, j - 1])
+                            lcs[i, j] = lcs[i - 1, j];
+                        else
+                            lcs[i, j] = lcs[i, j - 1];
+                    }
+                    
+                }
+            }
+            return lcs[str1.Length - 1, str2.Length - 1];
+        }
         #endregion
 
 #region 리스트박스 이벤트 핸들러
@@ -454,23 +484,19 @@ namespace tempproj
                     string filename = System.IO.Path.GetFileNameWithoutExtension(d.PathInfo);
                     filename = filename.Replace(" ", "");
                     Console.WriteLine(filename);
+                    ComboBoxItem result = null;
+                    int max = 0;
 
                     foreach (ComboBoxItem cbi in d.cbItems)
                     {
                         string comp = (string)cbi.Content;
-                        int l, c = 0;
-                        if (filename.Length > comp.Length) l = comp.Length;
-                        else l = filename.Length;
-
-                        for (int i = 0; i < l; i++)
-                            if (filename[i] == comp[i]) c++;
-
-                        if (c >= l / 2)
-                        {
-                            ((ComboBox)sender).SelectedItem = cbi;
-                            break;
+                        int cur = LCS(filename, comp);
+                        if(max < cur){
+                            max = cur;
+                            result = cbi;
                         }
                     }
+                    ((ComboBox)sender).SelectedItem = result;
                 }
             }
         }
