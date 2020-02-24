@@ -33,7 +33,7 @@ namespace tempproj
         public ComboBoxItem SelectedtzItem { get; set; }
         public JObject CurrentJson { get; set; }
         public TextBox JsonTextBlock { get; set; }
-        private string path = @"../../../MappingInfo.json";
+        private string path = @"./MappingInfo.json";
         private int EventFlag { get; set; }
 
         public MappingTable()
@@ -406,7 +406,9 @@ namespace tempproj
         private void BtnDeleteJson_Click(object sender, RoutedEventArgs e)
         {
             String jsonType = CurrentSelectedObjInfo.Item1;
+            String jsonComp = CurrentSelectedObjInfo.Item2;
             String jsonSheet = CurrentSelectedObjInfo.Item2;
+            
             String jsonName = CurrentSelectedObjInfo.Item3;
             
 
@@ -420,7 +422,7 @@ namespace tempproj
                     //List<JObject> elemList = fullObj["회사목록"].ToObject<List<JObject>>();
                     foreach (JObject companyInfo in fullObj["회사목록"])
                     {
-                        if (companyInfo["회사명"].ToString() == jsonName)
+                        if (companyInfo["회사명"].ToString() == jsonComp)
                         {
                             companyInfo.Remove();
                             break;
@@ -431,7 +433,7 @@ namespace tempproj
                     reader.Close();
                     File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
                 }
-                ClientTypeComboBox_ReLoad(jsonName);
+                ClientTypeComboBox_ReLoad("");
                 UpdateJsonTreeView("");
             }
             else if (jsonType == "SHEET")

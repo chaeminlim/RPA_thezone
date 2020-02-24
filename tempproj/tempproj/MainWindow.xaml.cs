@@ -36,7 +36,7 @@ namespace tempproj
         private ContextController contextController;
         private ExcelActivity excelActivity;
         private List<ExcelWorkQueueDataStruct> ExcelWorkQueue;
-        private string path = @"../../../MappingInfo.json";
+        private string path = @"./MappingInfo.json";
         private double scr = double.MaxValue;
         
 
