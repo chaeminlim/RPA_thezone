@@ -445,8 +445,9 @@ namespace tempproj
 
                 if (ssn != null)
                 {
-                    Regex regex = new Regex(@"^[A-Z]{3}");
-                    if (!regex.IsMatch(ssn.ToString()))
+                    Regex newschool = new Regex(@"^[A-Z]{3}");
+                    Regex oldschool = new Regex(@"^\d{5}");
+                    if (!newschool.IsMatch(ssn.ToString()) && !oldschool.IsMatch(ssn.ToString()))
                     {
                         deleted.Push(item);
                         deletedcnt++;
@@ -472,49 +473,30 @@ namespace tempproj
         {
             Excel.Range usedrng = thezoneWS.UsedRange;
             Excel.Range sum = null;
-            //Excel.Range valrng = usedrng.Offset[3, 1];
-
-            //Console.WriteLine(usedrng.Rows.Count + " " + usedrng.Columns.Count + " " + maxbound);
             int colcnt = 84;
 
 
             ////////직원별 합계
-            //String forsum = GetExcelColumnName(columncnt + 1);
-            //String forend = GetExcelColumnName(columncnt);
             String forsum = GetExcelColumnName(colcnt + 1);
             String fortotalsum = GetExcelColumnName(colcnt + 2);
             String forend = GetExcelColumnName(colcnt);
 
-            //Console.WriteLine("=ROUND(SUM(B" + minbound.ToString() + ":" + forend + minbound.ToString() + "), 0)");
             sum = thezoneWS.Range[forsum + minbound.ToString()];
             Excel.Range employeesum = sum.Resize[totalrow - 5, Type.Missing];//offset 때문에 4를 빼줌 + 개수만큼 늘려서 1을 더 빼줌
             employeesum.Formula = "=SUM(B" + minbound.ToString() + ":" + "BH" + minbound.ToString() + ")"; //직원 당 합계
+            employeesum.Copy();
+            employeesum.PasteSpecial(Excel.XlPasteType.xlPasteValues, Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone);
+            employeesum.NumberFormat = "#,##0";
+
 
 
             ////////category별 합계
-            //Console.WriteLine("=ROUND(SUM(B" + minbound.ToString() + ":B" + (maxbound - 1).ToString() + "), 0)");
             sum = thezoneWS.Range["B" + maxbound];
             Excel.Range categorysum = sum.Resize[Type.Missing, colcnt];
             categorysum.Formula = "=SUM(B" + minbound.ToString() + ":B" + (maxbound - 1).ToString() + ")"; //항목 별 합계
-            //SumFlag.Add(maxbound);
-
-            ////////category별 합계와 직원별 합계의 합
-            Excel.Range totalsum = thezoneWS.Range[fortotalsum + maxbound.ToString()];
-            //string formula = "=ROUND(SUM(" + forsum + minbound.ToString() + ":" + forsum + (maxbound - 1).ToString() + ", B" + maxbound.ToString() + ":" + forend + maxbound.ToString() + "), 0)"; //최종 합계
-            string formula = "=SUM(" + ", B" + maxbound.ToString() + ":" + forsum + maxbound.ToString() + ")";
-            //Console.WriteLine(formula);
-            totalsum.Formula = formula;
-            //totalsum.NumberFormat = '0';
-
-            //categorysum.Copy();
-            //categorysum.PasteSpecial(Excel.XlPasteType.xlPasteValues, Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone);
-
-            //employeesum.Copy();
-            //employeesum.PasteSpecial(Excel.XlPasteType.xlPasteValues, Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone);
-
-            //totalsum.Copy();
-            //totalsum.PasteSpecial(Excel.XlPasteType.xlPasteValues, Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone);
-
+            categorysum.Copy();
+            categorysum.PasteSpecial(Excel.XlPasteType.xlPasteValues, Excel.XlPasteSpecialOperation.xlPasteSpecialOperationNone);
+            categorysum.NumberFormat = "#,##0";
 
         }
         private void DeleteNullRow(string thezone)
@@ -568,13 +550,19 @@ namespace tempproj
         }
         private void round()
         {
-            string valstart = GetExcelColumnName(2);
-            //String forend = GetExcelColumnName(columncnt);
-            String forend = GetExcelColumnName(thezoneWS.UsedRange.Columns.Count);
-            //Console.WriteLine(columncnt);
-            //Console.WriteLine("Found Range : " + valstart + 4.ToString() + ":" + forend + maxbound.ToString());
-            //Excel.Range valrng = thezoneWS.Range[valstart + 4.ToString() + ":" + forend + maxbound.ToString()];
-            Excel.Range valrng = thezoneWS.UsedRange.Offset[3, 1];
+            int lastUsedRow = thezoneWS.Cells.Find("*", System.Reflection.Missing.Value,
+                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+            // Find the last real column
+            int lastUsedColumn = thezoneWS.Cells.Find("*", System.Reflection.Missing.Value,
+                                           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                                           Excel.XlSearchOrder.xlByColumns, Excel.XlSearchDirection.xlPrevious,
+                                           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Column;
+            String valcolend = GetExcelColumnName(lastUsedColumn - 1);
+            //Excel.Range valrng = thezoneWS.UsedRange.Offset[3, 1];
+            Excel.Range valrng = thezoneWS.Range["B4:" + valcolend + lastUsedRow.ToString()];
+            //Console.WriteLine(valrng.Rows.Count + " " + valrng.Columns.Count);
             valrng.NumberFormat = "#,##0";
             Object[,] val = valrng.Value;
             //Console.WriteLine(val.GetLength(0) + " " + val.GetLength(1));
@@ -586,7 +574,7 @@ namespace tempproj
                     if (val[i, j] != null)
                     {
                         //Console.Write(val[i,j] + " ");
-                        val[i, j] = Math.Round((double)val[i, j], 0);
+                        val[i, j] = Math.Round(Convert.ToDouble(val[i, j]), 0);
                     }
                 }
                 //Console.WriteLine("");
