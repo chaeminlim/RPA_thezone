@@ -28,7 +28,7 @@ namespace tempproj
     {
         public ObservableCollection<ComboBoxItem> cbItems { get; set; }
         public ObservableCollection<ComboBoxItem> TheZoneItems { get; set; }
-        private Tuple<String, String, String> CurrentSelectedObjInfo;
+        private Tuple<String, String, String, String, dynamic> CurrentSelectedObjInfo;
         public ComboBoxItem SelectedcbItem { get; set; }
         public ComboBoxItem SelectedtzItem { get; set; }
         public JObject CurrentJson { get; set; }
@@ -114,6 +114,8 @@ namespace tempproj
             }
         }
 
+        
+
         private void UpdateJsonTreeView(String companyNameParam = null)
         {
             JsonTreeView.Items.Clear();
@@ -180,6 +182,7 @@ namespace tempproj
                     
                     String cellPoint = mapping["셀위치"].ToString();
                     String cellName = mapping["셀이름"].ToString();
+                    var thezoneName = mapping["더존이름"];
 
                     TreeViewItem cellPointTreeViewItem = new TreeViewItem
                     {
@@ -189,7 +192,7 @@ namespace tempproj
                     TreeViewItem mappingInfoTreeViewItem = new TreeViewItem
                     {
                         Header = "배치정보" + i++ +  " : " + cellName,
-                        Tag = new Tuple<String, String>(cellName, sheetName) 
+                        Tag = new Tuple<String, String, String, dynamic>(sheetName, cellName, cellPoint, thezoneName)
                     };
 
                     cellPointTreeViewItem.Selected += CellPointTreeViewItem_Selected;
@@ -204,8 +207,7 @@ namespace tempproj
                         }
                         TreeViewItem toZoneTreeViewItem = new TreeViewItem
                         {
-                            Header = toZones,
-                            
+                            Header = toZones
                         };
 
                         toZoneTreeViewItem.Selected += CellPointTreeViewItem_Selected;
@@ -276,7 +278,7 @@ namespace tempproj
         {
             if (EventFlag >= 3)
             {
-                CurrentSelectedObjInfo = new Tuple<String, String, String>("COMPANY", (String)((TreeViewItem)sender).Header, "");
+                CurrentSelectedObjInfo = new Tuple<String, String, String, String, dynamic>("COMPANY", (String)((TreeViewItem)sender).Header, "", "", "");
                 BtnDeleteJson.IsEnabled = true;
                 EditSheetTabItem.IsEnabled = false;
                 EditMappingTabItem.IsEnabled = false;
@@ -289,7 +291,7 @@ namespace tempproj
         {
             if (EventFlag >= 2)
             {
-                CurrentSelectedObjInfo = new Tuple<String, String, String>("SHEET", (String)((TreeViewItem)sender).Tag, null);
+                CurrentSelectedObjInfo = new Tuple<String, String, String, String, dynamic>("SHEET", (String)((TreeViewItem)sender).Tag, "", "", "");
                 BtnDeleteJson.IsEnabled = true;
                 EditSheetTabItem.IsEnabled = false;
                 EditMappingTabItem.IsEnabled = false;
@@ -302,11 +304,54 @@ namespace tempproj
         {
             if (EventFlag >= 1)
             {
-                CurrentSelectedObjInfo = new Tuple<String, String, String>("MAPPING", ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item1, ((Tuple<String, String>)((TreeViewItem)sender).Tag).Item2);
+                CurrentSelectedObjInfo = new Tuple<String, String, String, String , dynamic>("MAPPING", ((Tuple<String, String, String, dynamic>)((TreeViewItem)sender).Tag).Item1, ((Tuple<String, String, String, dynamic>)((TreeViewItem)sender).Tag).Item2,
+                    ((Tuple<String, String, String, dynamic>)((TreeViewItem)sender).Tag).Item3, ((Tuple<String, String, String, dynamic>)((TreeViewItem)sender).Tag).Item4);
                 BtnDeleteJson.IsEnabled = true;
                 EditSheetTabItem.IsEnabled = false;
-                EditMappingTabItem.IsEnabled = false;
-                EditCompanyTabItem.IsSelected = true;
+                EditMappingTabItem.IsEnabled = true;
+                EditMappingTabItem.IsSelected = true;
+                
+
+                divisionCheckBox.IsChecked = false;
+                sheetNameTextBox.Clear();
+                cellPointTextBox.Clear();
+                cellNameTextBox.Clear();
+                divisionTextBox.Clear();
+                theZoneTrueListBox.Items.Clear();
+                theZoneFalseListBox.Items.Clear();
+                valueCheckListBox.Items.Clear();
+                theZoneFalseTextBox.Clear();
+                theZoneTrueTextBox.Clear();
+                valueCheckTextBox.Clear();
+
+                sheetNameTextBox.Text = CurrentSelectedObjInfo.Item2;
+                cellNameTextBox.Text = CurrentSelectedObjInfo.Item3;
+                cellPointTextBox.Text = CurrentSelectedObjInfo.Item4;
+                var thezone = CurrentSelectedObjInfo.Item5;
+                if (thezone[0] is JObject)
+                {
+                    JObject mappingByPos = (JObject)thezone[0];
+                    String divisionText = mappingByPos["구분"].ToString();
+                    List<String> pos = mappingByPos["값"].ToObject<List<String>>();
+                    String trueText = mappingByPos["True"].ToString();
+                    String falseText = mappingByPos["False"].ToString();
+                    divisionCheckBox.IsChecked = true;
+                    divisionTextBox.Text = divisionText;
+                    theZoneTrueListBox.Items.Add(trueText);
+                    theZoneFalseListBox.Items.Add(falseText);
+                    foreach (var item in pos)
+                    {
+                        valueCheckListBox.Items.Add(item);
+                    }
+
+                }
+                else
+                {
+                    foreach (String name in thezone)
+                    {
+                        theZoneTrueListBox.Items.Add(name);
+                    }
+                }
             }
             EventFlag = 1;
 
@@ -319,14 +364,28 @@ namespace tempproj
             EditMappingTabItem.IsEnabled = false;
         }
 
+        
+
         private void AddCellButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
+            CurrentSelectedObjInfo = null;
             EventFlag = 0;
             BtnDeleteJson.IsEnabled = false;
             EditSheetTabItem.IsEnabled = false;
             EditMappingTabItem.IsEnabled = true;
             EditMappingTabItem.IsSelected = true;
 
+
+            divisionCheckBox.IsChecked = false;
+            sheetNameTextBox.Clear();
+            cellPointTextBox.Clear();
+            cellNameTextBox.Clear();
+            divisionTextBox.Clear();
+            theZoneTrueListBox.Items.Clear();
+            theZoneFalseListBox.Items.Clear();
+            theZoneFalseTextBox.Clear();
+            theZoneTrueTextBox.Clear();
+            valueCheckTextBox.Clear();
         }
 
         private void AddSheetButtonTreeViewItem_Selected(object sender, RoutedEventArgs e)
@@ -347,8 +406,9 @@ namespace tempproj
         private void BtnDeleteJson_Click(object sender, RoutedEventArgs e)
         {
             String jsonType = CurrentSelectedObjInfo.Item1;
-            String jsonName = CurrentSelectedObjInfo.Item2;
-            String jsonSheet = CurrentSelectedObjInfo.Item3;
+            String jsonSheet = CurrentSelectedObjInfo.Item2;
+            String jsonName = CurrentSelectedObjInfo.Item3;
+            
 
             // JObject CurrentJson
             if(jsonType == "COMPANY")
@@ -388,7 +448,7 @@ namespace tempproj
                         {
                             foreach(JObject sheetInfo in companyInfo["시트"])
                             {
-                                if (sheetInfo["시트이름"].ToString() == jsonName)
+                                if (sheetInfo["시트이름"].ToString() == jsonSheet)
                                 {
                                     sheetInfo.Remove();
                                     break;
@@ -456,6 +516,7 @@ namespace tempproj
         #region 추가기능 
         private void EditCompanyYesButton_Click(object sender, RoutedEventArgs e)
         {
+            
             if(CompanyNameTextBox.Text == "")
             {
                 MessageBox.Show("회사명을 입력하세요.");
@@ -474,6 +535,7 @@ namespace tempproj
                 ((JArray)fullObj["회사목록"]).Add(companyObj);
 
                 string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
+                Console.WriteLine(output);
                 reader.Close();
                 File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
             }
@@ -520,28 +582,33 @@ namespace tempproj
 
         private void EditMappingYesButton_Click(object sender, RoutedEventArgs e)
         {
+            
             String cellPoint = cellPointTextBox.Text;
             String cellName = cellNameTextBox.Text;
             String division = divisionTextBox.Text;
             String sheetName = sheetNameTextBox.Text;
+            
             String tempCompName = CurrentJson["회사명"].ToString();
-
-            List<String> valueCheckList = new List<string>();
+            
+            List<String> valueCheckList = new List<String>();
             List<String> theZoneTrueList = new List<String>();
             List<String> theZoneFalseList = new List<String>();
 
             foreach (String listBoxItem in valueCheckListBox.Items)
                 valueCheckList.Add(listBoxItem);
-            foreach (String listBoxItem in theZoneTrueListBox.Items)
+            
+            foreach (String listBoxItem in theZoneTrueListBox.Items) {
+                Console.WriteLine(listBoxItem);
                 theZoneTrueList.Add(listBoxItem);
+            }
             foreach (String listBoxItem in theZoneFalseListBox.Items)
                 theZoneFalseList.Add(listBoxItem);
             
             dynamic mappingObj = new JObject();
-
+            
             if ((bool)divisionCheckBox.IsChecked)
             {
-                mappingObj = new JObject();
+                //mappingObj = new JObject();
                 mappingObj.셀위치 = cellPoint;
                 mappingObj.셀이름 = cellName;
                 dynamic mappingtzInfo = new JObject();
@@ -564,12 +631,13 @@ namespace tempproj
             }
             else // 일반경우
             {
-                mappingObj = new JObject();
+                //mappingObj = new JObject();
                 mappingObj.셀위치 = cellPoint;
                 mappingObj.셀이름 = cellName;
                 mappingObj.더존이름 = new JArray(theZoneTrueList);
 
             }
+            
             using (StreamReader file = new StreamReader(path, Encoding.GetEncoding("UTF-8")))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -580,14 +648,36 @@ namespace tempproj
                     {
                         foreach (JObject sheetInfo in companyInfo["시트"])
                         {
-                            int flag = 0;
                             if (sheetInfo["시트이름"].ToString() == sheetName)
                             {
-                                flag = 1;
-                                ((JArray)sheetInfo["배치표"]).Add(mappingObj);
-                                break;
+                                bool flag = true;
+                                if (CurrentSelectedObjInfo != null)
+                                {
+                                    foreach (JObject mappingInfo in sheetInfo["배치표"])
+                                    { 
+                                    
+                                        if (mappingInfo["셀위치"].ToString().Equals(CurrentSelectedObjInfo.Item4))
+                                        {
+                                            flag = false;
+                                            mappingInfo["셀위치"] = mappingObj.셀위치;
+                                            mappingInfo["셀이름"] = mappingObj.셀이름;
+                                            mappingInfo["더존이름"] = mappingObj.더존이름;
+                                            //foreach (String thezoneName in theZoneTrueList)
+                                            //{
+                                            //    mappingInfo["더존이름"].ToObject<List<String>>().Add(thezoneName);
+                                            //}
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(flag)
+                                {
+                                    ((JArray)sheetInfo["배치표"]).Add(mappingObj);
+                                    break;
+                                }
+                                
                             }
-                            if(flag == 0)
+                            else
                             {
                                 MessageBox.Show("시트 정보가 잘못되었습니다.");
                                 return;
@@ -596,6 +686,7 @@ namespace tempproj
                         break;
                     }
                 }
+                
                 string output = JsonConvert.SerializeObject(fullObj, Newtonsoft.Json.Formatting.Indented);
                 reader.Close();
                 File.WriteAllText(path, output, Encoding.GetEncoding("UTF-8"));
@@ -662,11 +753,10 @@ namespace tempproj
             theZoneFalseListBox.Items.Clear();
         }
 
-        #endregion
 
         #endregion
 
-        
+        #endregion
     }
 
     #region 기존코드

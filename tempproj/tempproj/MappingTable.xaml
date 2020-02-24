@@ -84,7 +84,7 @@
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="배치정보추가" x:Name="EditMappingTabItem" IsEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Visible">
-                        <ScrollViewer>
+                        <ScrollViewer Margin="1,64,-1,-2">
                             <StackPanel x:Name="EditMappingTabItemStackPanel" CanVerticallyScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible">
                                 <Label Content="구분이 필요하면 체크박스를 선택하세요."></Label>
                                 <CheckBox x:Name="divisionCheckBox"></CheckBox>
@@ -126,6 +126,7 @@
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
+                    
                 </TabControl>
                 
             </Grid>
